@@ -11,12 +11,36 @@ export type ProjectIntent = Readonly<{
   updated_at: {};
 }>;
 
+type Message = { contentType: string; content: string };
+
+type Slot = {
+  name: string;
+  description: string;
+  slotConstraint: string;
+  slotType: string;
+  slotTypeVersion: string;
+  valueElicitationPrompt: {
+    messages: Message[];
+    maxAttempts: number;
+  };
+  priority: number;
+  sampleUtterances: string[];
+};
+
 export type ResourceIntent = {
   description: string;
-  rejectionStatement?: { messages: { contentType: string; content: string }[] };
+  rejectionStatement?: { messages: Message[] };
   name: string;
   version: string;
   fulfillmentActivity: { type: string };
   sampleUtterances: string[];
-  slots?: any[];
+  slots?: Slot[];
+  confirmationPrompt: {
+    messages: Message[];
+    maxAttempts: number;
+  };
+  conclusionStatement: {
+    messages: Message[];
+    responseCard: string;
+  };
 };

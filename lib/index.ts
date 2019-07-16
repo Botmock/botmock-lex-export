@@ -10,6 +10,9 @@ function mapIntentToResource(intent: ProjectIntent): Partial<ResourceIntent> {
   const RETURN_INTENT = "ReturnIntent";
   return {
     description: "",
+    rejectionStatement: {
+      messages: [],
+    },
     name: intent.name,
     version: "2",
     fulfillmentActivity: {
@@ -18,6 +21,15 @@ function mapIntentToResource(intent: ProjectIntent): Partial<ResourceIntent> {
     sampleUtterances: intent.utterances.map(utterance =>
       symmetricWrap(utterance.text, { l: "{", r: "}" })
     ),
+    slots: [],
+    confirmationPrompt: {
+      messages: [],
+      maxAttempts: 1,
+    },
+    conclusionStatement: {
+      messages: [],
+      responseCard: "",
+    },
   };
 }
 
