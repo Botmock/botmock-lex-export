@@ -1,0 +1,50 @@
+{
+  "name": "botmock-lex-export",
+  "version": "1.0.0",
+  "description": "generate lex resource from botmock project",
+  "main": "index.ts",
+  "module": "index.ts",
+  "scripts": {
+    "test": "jest",
+    "start": "ts-node index.ts"
+  },
+  "keywords": [
+    "botmock",
+    "amazon",
+    "lex",
+    "nodejs"
+  ],
+  "prettier": {
+    "trailingComma": "es5",
+    "tabWidth": 2,
+    "printWidth": 80
+  },
+  "jest": {
+    "preset": "ts-jest",
+    "globals": {
+      "ts-jest": {
+        "tsConfig": "tsconfig.json"
+      }
+    }
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/Botmock/botmock-lex-export.git"
+  },
+  "license": "MIT",
+  "dependencies": {
+    "@botmock-api/utils": "2.1.0",
+    "dotenv": "8.0.0",
+    "node-fetch": "2.6.0",
+    "uuid": "3.3.2"
+  },
+  "devDependencies": {
+    "@types/jest": "24.0.15",
+    "@types/node": "12.6.2",
+    "@types/node-fetch": "2.3.7",
+    "jest": "24.8.0",
+    "ts-jest": "^24.0.2",
+    "ts-node": "8.3.0",
+    "typescript": "3.5.3"
+  }
+}
