@@ -1,4 +1,5 @@
 .env
 output
+ScheduleAppointment_Export.json
 node_modules
 npm-debug.log

@@ -23,6 +23,7 @@ export async function writeResource(
   filepath: string
 ): Promise<void> {
   const [intents, entities, board, { name }] = project.data;
+  const SESSION_TTL_SECS = 800;
   const data =
     JSON.stringify(
       {
@@ -36,6 +37,14 @@ export async function writeResource(
           version: "1",
           intents: intents.map(mapIntentToResource),
         },
+        slotTypes: [],
+        voiceId: "",
+        childDirected: false,
+        locale: "en-US",
+        idleSessionTTLInSeconds: SESSION_TTL_SECS,
+        description: "",
+        clarificationPrompt: {},
+        abortStatement: {},
       },
       null,
       2
