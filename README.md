@@ -6,7 +6,7 @@ Generates an [Amazon Lex resource](https://docs.aws.amazon.com/lex/latest/dg/imp
 - Documentation (Coming Soon)
 - [Support Email](mailto:help@botmock.com)
 
-## ethos
+<!-- ## ethos -->
 
 ## prerequisites
 
@@ -43,14 +43,7 @@ BOTMOCK_PROJECT_ID=@YOUR-BOTMOCK-PROJECT-ID
 npm start
 ```
 
-By default, the generated file appears in `/output`. This can be changed by including the
-path to the desired output directory after the `start` command:
-
-```shell
-npm start model
-```
-
-### importing
+<!-- ### importing -->
 
 ## want to help?
 
