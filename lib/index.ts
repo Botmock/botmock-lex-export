@@ -1,5 +1,6 @@
 import fs from "fs";
 import os from "os";
+import { symmetricWrap } from "@botmock-api/utils";
 import { ProjectIntent, ProjectResponse, ResourceIntent } from "./types";
 
 export { ProjectResponse } from "./types";
@@ -14,7 +15,9 @@ function mapIntentToResource(intent: ProjectIntent): Partial<ResourceIntent> {
     fulfillmentActivity: {
       type: RETURN_INTENT,
     },
-    sampleUtterances: [],
+    sampleUtterances: intent.utterances.map(utterance =>
+      symmetricWrap(utterance.text, { l: "{", r: "}" })
+    ),
   };
 }
 
