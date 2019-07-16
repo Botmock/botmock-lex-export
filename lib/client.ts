@@ -28,8 +28,9 @@ export default async function getProjectData({
           Authorization: `Bearer ${token}`,
         },
       });
+      console.info(`${path.match(/[a-z]{6,8}/gi) || "project"} fetched.`);
       if (!res.ok) {
-        throw new Error(`${res.status} response on Botmock API fetch request`);
+        throw res.status;
       }
       const json = await res.json();
       return json.hasOwnProperty("board") ? json.board.messages : json;

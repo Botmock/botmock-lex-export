@@ -1,4 +1,5 @@
 import "dotenv/config";
+import os from "os";
 import fs from "fs";
 import path from "path";
 import assert from "assert";
@@ -45,7 +46,9 @@ try {
     await writeResource(project, filepath);
     const { size } = await fs.promises.stat(filepath);
     console.info(
-      `done. ${path.sep}${path.basename(outputPath)} (${size / 1000}kB)`
+      `done. ${os.EOL}wrote resource to ${path.sep}${path.basename(
+        outputPath
+      )} (${size / 1000}kB).`
     );
   })();
 } catch (err) {
