@@ -8,11 +8,9 @@ export { default as getProjectData } from "./client";
 
 function mapIntentToResource(intent: ProjectIntent): Partial<ResourceIntent> {
   const RETURN_INTENT = "ReturnIntent";
+  const PLAIN_TEXT = "PlainText";
   return {
     description: "",
-    rejectionStatement: {
-      messages: [],
-    },
     name: intent.name,
     version: "2",
     fulfillmentActivity: {
@@ -22,14 +20,17 @@ function mapIntentToResource(intent: ProjectIntent): Partial<ResourceIntent> {
       symmetricWrap(utterance.text, { l: "{", r: "}" })
     ),
     slots: [],
-    confirmationPrompt: {
-      messages: [],
-      maxAttempts: 1,
-    },
-    conclusionStatement: {
-      messages: [],
-      responseCard: "",
-    },
+    // rejectionStatement: {
+    //   messages: [{ contentType: PLAIN_TEXT, content: ".." }],
+    // },
+    // confirmationPrompt: {
+    //   messages: [{ contentType: PLAIN_TEXT, content: ".." }],
+    //   maxAttempts: 1,
+    // },
+    // conclusionStatement: {
+    //   messages: [{ contentType: PLAIN_TEXT, content: ".." }],
+    //   responseCard: JSON.stringify({ version: 1 }),
+    // },
   };
 }
 
@@ -51,15 +52,15 @@ export async function writeResource(
           name,
           version: "1",
           intents: intents.map(mapIntentToResource),
+          slotTypes: [],
+          childDirected: false,
+          voiceId: "Salli",
+          locale: "en-US",
+          idleSessionTTLInSeconds: SESSION_TTL_SECS,
+          description: name,
+          // clarificationPrompt: {},
+          // abortStatement: {},
         },
-        slotTypes: [],
-        voiceId: "",
-        childDirected: false,
-        locale: "en-US",
-        idleSessionTTLInSeconds: SESSION_TTL_SECS,
-        description: "",
-        clarificationPrompt: {},
-        abortStatement: {},
       },
       null,
       2
