@@ -43,7 +43,14 @@ BOTMOCK_PROJECT_ID=@YOUR-BOTMOCK-PROJECT-ID
 npm start
 ```
 
-<!-- ### importing -->
+### importing in Lex
+
+- Compress the generated `.json` file
+- Visit the Lex console [AWS console](https://console.aws.amazon.com/lex/)
+- Choose **Bots**
+- Choose **Actions**
+- Choose **Import**
+- Select the `.zip` file
 
 ## want to help?
 
