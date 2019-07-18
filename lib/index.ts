@@ -6,9 +6,15 @@ import { ProjectIntent, ProjectResponse, ResourceIntent } from "./types";
 export { ProjectResponse } from "./types";
 export { default as getProjectData } from "./client";
 
+function createMessageFromContent(
+  content: string,
+  contentType: string = "PlainText"
+) {
+  return { content, contentType };
+}
+
 function mapIntentToResource(intent: ProjectIntent): Partial<ResourceIntent> {
   const RETURN_INTENT = "ReturnIntent";
-  const PLAIN_TEXT = "PlainText";
   return {
     description: "",
     name: intent.name,
@@ -40,6 +46,8 @@ export async function writeResource(
 ): Promise<void> {
   const [intents, entities, board, { name }] = project.data;
   const SESSION_TTL_SECS = 800;
+  const FALLBACK_INTENT_CONTENT =
+    "I didn't understand you, what would you like me to do?";
   const data =
     JSON.stringify(
       {
@@ -58,7 +66,10 @@ export async function writeResource(
           locale: "en-US",
           idleSessionTTLInSeconds: SESSION_TTL_SECS,
           description: name,
-          // clarificationPrompt: {},
+          clarificationPrompt: {
+            messages: [createMessageFromContent(FALLBACK_INTENT_CONTENT)],
+            maxAttempts: 2,
+          },
           // abortStatement: {},
         },
       },

@@ -35,6 +35,12 @@ export type ResourceIntent = {
   fulfillmentActivity: { type: string };
   sampleUtterances: string[];
   slots?: Slot[];
+  locale: string;
+  idleSessionTTLInSeconds: number;
+  clarificationPrompt: {
+    messages: Message[];
+    maxAttempts: number;
+  };
   confirmationPrompt: {
     messages: Message[];
     maxAttempts: number;
