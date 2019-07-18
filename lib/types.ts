@@ -41,6 +41,9 @@ export type ResourceIntent = {
     messages: Message[];
     maxAttempts: number;
   };
+  abortStatement: {
+    messages: Message[];
+  };
   confirmationPrompt: {
     messages: Message[];
     maxAttempts: number;

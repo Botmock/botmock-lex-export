@@ -48,7 +48,7 @@ try {
     console.info(
       `done. ${os.EOL}wrote resource to ${path.sep}${path.basename(
         outputPath
-      )} (${size / 1000}kB).`
+      )}${path.sep}${path.basename(filepath)} (${size / 1000}kB).`
     );
   })();
 } catch (err) {
