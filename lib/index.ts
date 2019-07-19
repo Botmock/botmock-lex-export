@@ -6,20 +6,24 @@ import { ProjectIntent, ProjectResponse, ResourceIntent } from "./types";
 export { ProjectResponse } from "./types";
 export { default as getProjectData } from "./client";
 
+const FALLBACK_INTENT_CONTENT =
+  process.env.FALLBACK_INTENT_CONTENT ||
+  "I didn't understand you, what would you like me to do?";
+
+const QUIT_INTENT_CONTENT =
+  process.env.QUIT_INTENT_CONTENT ||
+  "Sorry, I am not able to assist at this time";
+
+const VOICE_ID = process.env.VOICE_ID || "Salli";
+const LOCALE = process.env.LOCALE || "en-US";
+const SESSION_TTL_SECS = process.env.SESSION_TTL_SECS || 800;
+
 export async function writeResource(
   project: Partial<ProjectResponse>,
   filepath: string
 ): Promise<void> {
-  const [intents, entities, board, { name }] = project.data;
-  const SESSION_TTL_SECS = 800;
-  const FALLBACK_INTENT_CONTENT =
-    process.env.FALLBACK_INTENT_CONTENT ||
-    "I didn't understand you, what would you like me to do?";
-  const QUIT_INTENT_CONTENT =
-    process.env.QUIT_INTENT_CONTENT ||
-    "Sorry, I am not able to assist at this time";
-  const VOICE_ID = process.env.VOICE_ID || "Salli";
-  const LOCALE = process.env.LOCALE || "en-US";
+  const [intents, entities, messages, { name }] = project.data;
+  console.log(messages.map(m => m.next_message_ids.map(id => id.conditional)));
   // map an intent into the object required for the resource
   const mapIntentToResource = (intent: ProjectIntent): any => {
     return {
@@ -35,10 +39,10 @@ export async function writeResource(
       sampleUtterances: intent.utterances.map(utterance =>
         symmetricWrap(utterance.text, { l: "{", r: "}" })
       ),
+      // map over a reduction on unique variable names to create slots
       slots: Object.entries(
         intent.utterances
           .filter(utterance => utterance.variables.length > 0)
-          // map over a reduction on unique variable names
           .reduce(
             (acc, utt, _, utterances) => ({
               ...acc,
@@ -46,7 +50,7 @@ export async function writeResource(
                 (acc_, variable) => ({
                   ...acc_,
                   [variable.name.replace(/%/g, "")]: {
-                    name: variable.name,
+                    name: variable.name.replace(/%/g, ""),
                     description: "",
                     slotConstraint: "Required",
                     slotType: variable.entity
@@ -92,7 +96,7 @@ export async function writeResource(
           name,
           version: "1",
           intents: intents.map(mapIntentToResource),
-          slotTypes: getSlotTypes(),
+          slotTypes: getSlotTypes(entities),
           childDirected: false,
           voiceId: VOICE_ID,
           locale: LOCALE,
@@ -113,8 +117,14 @@ export async function writeResource(
   await fs.promises.writeFile(filepath, data);
 }
 
-function getSlotTypes(): any[] {
-  return [];
+function getSlotTypes(entities: any[]): any[] {
+  return entities.map(entity => ({
+    description: entity.id,
+    name: entity.name,
+    version: "1",
+    enumerationValues: entity.data.map(({ value }) => ({ value })),
+    valueSelectionStrategy: "ORIGINAL_VALUE",
+  }));
 }
 
 function createMessageFromContent(

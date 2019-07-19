@@ -6,7 +6,9 @@ Generates an [Amazon Lex resource](https://docs.aws.amazon.com/lex/latest/dg/imp
 - Documentation (Coming Soon)
 - [Support Email](mailto:help@botmock.com)
 
-<!-- ## ethos -->
+## ethos
+
+<!-- There are certain things to keep in mind about Botmock project structure in order to properly leverage this export script. -->
 
 ## prerequisites
 
