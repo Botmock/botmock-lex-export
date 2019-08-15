@@ -27,7 +27,9 @@ export async function writeResource(
   // because entities are mapped to slot types, if there are no entities, lex
   // will recognize no slot types and fail to import
   if (!entities.length) {
-    entities = [{ id: uuid(), name: "DEFAULT_ENTITY", data: [{ value: "_" }] }];
+    entities = [
+      { id: uuid(), name: "AMAZON.TIME", data: [{ value: Date.now() + "" }] },
+    ];
   }
   // map an intent into the object required for the resource
   const mapIntentToResource = (intent: ProjectIntent): any => {
@@ -144,3 +146,7 @@ function createMessageFromContent(
 ): any {
   return { content, contentType };
 }
+
+// function stripDisallowedCharactersFromString(str: string): string {
+//   return str.replace(/^[a-zA-Z_.]+/g, "");
+// }

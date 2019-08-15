@@ -1,9 +1,9 @@
 import "dotenv/config";
 import os from "os";
 import fs from "fs";
-// import zlib from "zlib";
 import path from "path";
 import assert from "assert";
+import { execSync } from "child_process";
 import { getProjectData, ProjectResponse, writeResource } from "./lib";
 
 const MIN_NODE_VERSION = 101600;
@@ -51,6 +51,16 @@ try {
         outputPath
       )}${path.sep}${path.basename(filepath)} (${size / 1000}kB).`
     );
+    // if (process.platform !== "win32") {
+    //   try {
+    //     execSync(
+    //       `zip ${filepath}.zip ${process.cwd()}${path.sep}${path.basename(
+    //         filepath
+    //       )}`
+    //     );
+    //     console.info("output zipped.");
+    //   } catch (_) {}
+    // }
   })();
 } catch (err) {
   console.error(err);
