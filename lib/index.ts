@@ -1,5 +1,6 @@
 import fs from "fs";
 import os from "os";
+import uuid from "uuid/v4";
 import { symmetricWrap } from "@botmock-api/utils";
 import { ProjectIntent, ProjectResponse, ResourceIntent } from "./types";
 
@@ -22,8 +23,12 @@ export async function writeResource(
   project: Partial<ProjectResponse>,
   filepath: string
 ): Promise<void> {
-  const [intents, entities, messages, { name }] = project.data;
-  console.log(messages.map(m => m.next_message_ids.map(id => id.conditional)));
+  let [intents, entities, messages, { name }] = project.data;
+  // because entities are mapped to slot types, if there are no entities, lex
+  // will recognize no slot types and fail to import
+  if (!entities.length) {
+    entities = [{ id: uuid(), name: "DEFAULT_ENTITY", data: [{ value: "_" }] }];
+  }
   // map an intent into the object required for the resource
   const mapIntentToResource = (intent: ProjectIntent): any => {
     return {
@@ -50,15 +55,21 @@ export async function writeResource(
                 (acc_, variable) => ({
                   ...acc_,
                   [variable.name.replace(/%/g, "")]: {
-                    name: variable.name.replace(/%/g, ""),
+                    name: variable.name
+                      .replace(/%/g, "")
+                      .replace(/\s/g, "")
+                      .trim(),
                     description: "",
                     slotConstraint: "Required",
                     slotType: variable.entity
                       ? (entities.find(id => id === variable.entity) || {}).name
-                      : "",
+                      : entities[0].name,
                     slotTypeVersion: "1",
                     valueElicitationPrompt: {
-                      messages: [createMessageFromContent("")],
+                      messages: [
+                        createMessageFromContent(FALLBACK_INTENT_CONTENT),
+                      ],
+                      maxAttempts: 1,
                     },
                     priority: 1,
                     sampleUtterances: utterances
@@ -74,14 +85,14 @@ export async function writeResource(
             {}
           )
       ).map(([_, values]) => values),
-      confirmationPrompt: {
-        messages: [],
-        maxAttempts: 1,
-      },
-      conclusionStatement: {
-        messages: [],
-        responseCard: JSON.stringify({ version: 1 }),
-      },
+      // confirmationPrompt: {
+      //   messages: [],
+      //   maxAttempts: 1,
+      // },
+      // conclusionStatement: {
+      //   messages: [],
+      //   responseCard: JSON.stringify({ version: 1 }),
+      // },
     };
   };
   const data =
@@ -93,7 +104,7 @@ export async function writeResource(
           importFormat: "JSON",
         },
         resource: {
-          name,
+          name: name.replace(/\s/g, "").toLowerCase(),
           version: "1",
           intents: intents.map(mapIntentToResource),
           slotTypes: getSlotTypes(entities),
@@ -122,7 +133,7 @@ function getSlotTypes(entities: any[]): any[] {
     description: entity.id,
     name: entity.name,
     version: "1",
-    enumerationValues: entity.data.map(({ value }) => ({ value })),
+    enumerationValues: entity.data.map(({ value = "" }) => ({ value })),
     valueSelectionStrategy: "ORIGINAL_VALUE",
   }));
 }

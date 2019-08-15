@@ -1,6 +1,7 @@
 import "dotenv/config";
 import os from "os";
 import fs from "fs";
+// import zlib from "zlib";
 import path from "path";
 import assert from "assert";
 import { getProjectData, ProjectResponse, writeResource } from "./lib";
