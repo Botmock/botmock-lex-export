@@ -6,21 +6,21 @@ Generates an [Amazon Lex resource](https://docs.aws.amazon.com/lex/latest/dg/imp
 - Documentation (Coming Soon)
 - [Support Email](mailto:help@botmock.com)
 
-## ethos
+## Ethos
 
 <!-- There are certain things to keep in mind about Botmock project structure in order to properly leverage this export script. -->
 
-## prerequisites
+## Prerequisites
 
+- [AWS Account](https://console.aws.amazon.com/console/home)
 - [Node.js](https://nodejs.org/en/) >= 10.16.x
 
 ```shell
 node --version
 ```
 
-- [AWS Account](https://console.aws.amazon.com/console/home)
 
-## guide
+## Guide
 
 Clone this repository and install dependencies:
 
@@ -45,7 +45,7 @@ BOTMOCK_PROJECT_ID=@YOUR-BOTMOCK-PROJECT-ID
 npm start
 ```
 
-### importing in Lex
+### Importing into Lex
 
 - Compress the generated `.json` file
 - Visit the Lex console [AWS console](https://console.aws.amazon.com/lex/)
@@ -54,11 +54,11 @@ npm start
 - Choose **Import**
 - Select the `.zip` file
 
-## want to help?
+## Want to help?
 
 Found bugs or have some ideas to improve this integration? We'd love to to hear from you! You can start by submitting an issue at the [Issues](https://github.com/Botmock/botmock-lex-export/issues) tab. If you want, feel free to submit a pull request and propose a change as well!
 
-### submitting a Pull Request
+### Submitting a Pull Request
 
 1. Start with creating an issue if possible, the more information, the better!
 2. Fork the Repository
@@ -67,6 +67,6 @@ Found bugs or have some ideas to improve this integration? We'd love to to hear 
 
 _NOTE: Make sure to leave any sensitive information out of an issue when reporting a bug with imagery or copying and pasting error data. We want to make sure all your info is safe!_
 
-## license
+## License
 
 Botmock Lex Export is copyright © 2019 Botmock. It is free software, and may be redistributed under the terms specified in the LICENSE file.
