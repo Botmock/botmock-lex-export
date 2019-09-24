@@ -3,7 +3,10 @@ import os from "os";
 import fs from "fs";
 import path from "path";
 import assert from "assert";
-import { execSync } from "child_process";
+// @ts-ignore
+// import pkg from "./package.json";
+// import { readFile } from "fs-extra";
+// import { execSync } from "child_process";
 import { getProjectData, ProjectResponse, writeResource } from "./lib";
 
 const MIN_NODE_VERSION = 101600;
