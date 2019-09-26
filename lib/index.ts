@@ -106,7 +106,7 @@ export async function writeResource(
           importFormat: "JSON",
         },
         resource: {
-          name: name.replace(/\s/g, "").toLowerCase(),
+          name: name.replace(/\s|-/g, "").toLowerCase(),
           version: "1",
           intents: intents.map(mapIntentToResource),
           slotTypes: getSlotTypes(entities),
