@@ -1,11 +1,14 @@
 import "dotenv/config";
 import { join } from "path";
+import { RewriteFrames } from "@sentry/integrations";
+import * as Sentry from "@sentry/node";
 import { writeJson } from "fs-extra";
 import { getProjectData, ProjectResponse, writeResource } from "./lib";
+import { SENTRY_DSN } from "./lib/constants";
 import { restoreOutput } from "./lib/file";
 import { default as log } from "./lib/log";
 // @ts-ignore
-// import pkg from "./package.json";
+import pkg from "./package.json";
 
 declare global {
   namespace NodeJS {
@@ -15,21 +18,21 @@ declare global {
   }
 }
 
-// global.__rootdir__ = __dirname || process.cwd();
+global.__rootdir__ = __dirname || process.cwd();
 
-// Sentry.init({
-//   dsn: SENTRY_DSN,
-//   release: `${pkg.name}@${pkg.version}`,
-//   integrations: [new RewriteFrames({
-//     root: global.__rootdir__
-//   })],
-//   beforeSend(event): Sentry.Event {
-//     if (event.user.email) {
-//       delete event.user.email;
-//     }
-//     return event;
-//   }
-// });
+Sentry.init({
+  dsn: SENTRY_DSN,
+  release: `${pkg.name}@${pkg.version}`,
+  integrations: [new RewriteFrames({
+    root: global.__rootdir__
+  })],
+  beforeSend(event): Sentry.Event {
+    if (event.user.email) {
+      delete event.user.email;
+    }
+    return event;
+  }
+});
 
 async function main(args: string[]): Promise<void> {
   const DEFAULT_OUTPUT = "output";
@@ -61,7 +64,7 @@ process.on("uncaughtException", () => { });
 
 main(process.argv).catch(async (err: Error) => {
   if (process.env.OPT_IN_ERROR_REPORTING) {
-    // Sentry.captureException(err);
+    Sentry.captureException(err);
   } else {
     const { message, stack } = err;
     await writeJson(join(__dirname, "err.json"), {
