@@ -61,9 +61,9 @@ export async function writeResource(
     ).map(([_, values]) => values);
     return {
       description: intent.id,
-      rejectionStatement: {
-        messages: [createMessageFromContent(`!${intent.name}`)],
-      },
+      // rejectionStatement: {
+      //   messages: [createMessageFromContent(`!${intent.name}`)],
+      // },
       name: intent.name,
       version: "2",
       fulfillmentActivity: { type: "ReturnIntent" },
