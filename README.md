@@ -6,13 +6,11 @@ Generates an [Amazon Lex resource](https://docs.aws.amazon.com/lex/latest/dg/imp
 - Documentation (Coming Soon)
 - [Support Email](mailto:help@botmock.com)
 
-## ethos
-
-<!-- There are certain things to keep in mind about Botmock project structure in order to properly leverage this export script. -->
+<!-- ## ethos -->
 
 ## prerequisites
 
-- [Node.js](https://nodejs.org/en/) >= 10.16.x
+- [Node.js](https://nodejs.org/en/) >= 12.x
 
 ```shell
 node --version
@@ -29,10 +27,10 @@ git clone git@github.com:Botmock/botmock-lex-export.git
 
 cd botmock-lex-export
 
-npm i
+npm install
 ```
 
-Create `/.env` and fill in values for the following:
+Create `.env` and fill in values for the following:
 
 ```shell
 BOTMOCK_TOKEN=@YOUR-BOTMOCK-TOKEN
@@ -40,6 +38,8 @@ BOTMOCK_TEAM_ID=@YOUR-BOTMOCK-TEAM-ID
 BOTMOCK_BOARD_ID=@YOUR-BOTMOCK-BOARD-ID
 BOTMOCK_PROJECT_ID=@YOUR-BOTMOCK-PROJECT-ID
 ```
+
+Start the script:
 
 ```shell
 npm start

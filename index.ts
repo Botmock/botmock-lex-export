@@ -1,71 +1,75 @@
 import "dotenv/config";
-import os from "os";
-import fs from "fs";
-import path from "path";
-import assert from "assert";
-// @ts-ignore
-// import pkg from "./package.json";
-// import { readFile } from "fs-extra";
-// import { execSync } from "child_process";
+import { join } from "path";
+import { RewriteFrames } from "@sentry/integrations";
+import * as Sentry from "@sentry/node";
+import { writeJson } from "fs-extra";
 import { getProjectData, ProjectResponse, writeResource } from "./lib";
+import { SENTRY_DSN } from "./lib/constants";
+import { restoreOutput } from "./lib/file";
+import { default as log } from "./lib/log";
+// @ts-ignore
+import pkg from "./package.json";
 
-const MIN_NODE_VERSION = 101600;
-const numericalNodeVersion = parseInt(
-  process.version
-    .slice(1)
-    .split(".")
-    .map(seq => seq.padStart(2, "0"))
-    .join(""),
-  10
-);
-
-export const outputPath = path.join(
-  process.cwd(),
-  process.env.OUTPUT_DIR || "output"
-);
-
-try {
-  assert.strictEqual(numericalNodeVersion < MIN_NODE_VERSION, false);
-} catch (_) {
-  throw "node.js version must be >= 10.16.0";
+declare global {
+  namespace NodeJS {
+    interface Global {
+      __rootdir__: string;
+    }
+  }
 }
 
-try {
-  (async () => {
+global.__rootdir__ = __dirname || process.cwd();
+
+Sentry.init({
+  dsn: SENTRY_DSN,
+  release: `${pkg.name}@${pkg.version}`,
+  integrations: [new RewriteFrames({
+    root: global.__rootdir__
+  })],
+  beforeSend(event): Sentry.Event {
+    if (event.user.email) {
+      delete event.user.email;
+    }
+    return event;
+  }
+});
+
+async function main(args: string[]): Promise<void> {
+  const DEFAULT_OUTPUT = "output";
+  let [, , outputDirectory] = args;
+  if (typeof outputDirectory === "undefined") {
+    outputDirectory = process.env.OUTPUT_DIR;
+  }
+  const outputDir = join(__dirname, outputDirectory || DEFAULT_OUTPUT);
+  try {
+    log("recreating output directory");
+    await restoreOutput(outputDir);
     const project: ProjectResponse = await getProjectData({
       projectId: process.env.BOTMOCK_PROJECT_ID,
       boardId: process.env.BOTMOCK_BOARD_ID,
       teamId: process.env.BOTMOCK_TEAM_ID,
       token: process.env.BOTMOCK_TOKEN,
     });
-    assert.strictEqual(project.errors.length, 0);
-    try {
-      await fs.promises.access(outputPath, fs.constants.R_OK);
-    } catch (_) {
-      // create output path if unable to read from it
-      await fs.promises.mkdir(outputPath);
-    }
     const [, , , meta] = project.data;
-    const filepath = path.join(outputPath, `${meta.name}_export.json`);
+    const filepath = join(outputDir, `${meta.name}_export.json`);
     await writeResource(project, filepath);
-    const { size } = await fs.promises.stat(filepath);
-    console.info(
-      `done. ${os.EOL}wrote resource to ${path.sep}${path.basename(
-        outputPath
-      )}${path.sep}${path.basename(filepath)} (${size / 1000}kB).`
-    );
-    // if (process.platform !== "win32") {
-    //   try {
-    //     execSync(
-    //       `zip ${filepath}.zip ${process.cwd()}${path.sep}${path.basename(
-    //         filepath
-    //       )}`
-    //     );
-    //     console.info("output zipped.");
-    //   } catch (_) {}
-    // }
-  })();
-} catch (err) {
-  console.error(err);
-  process.exit(1);
+  } catch (err) {
+    log(err.stack, { hasError: true });
+    throw err;
+  }
 }
+
+process.on("unhandledRejection", () => { });
+process.on("uncaughtException", () => { });
+
+main(process.argv).catch(async (err: Error) => {
+  if (process.env.OPT_IN_ERROR_REPORTING) {
+    Sentry.captureException(err);
+  } else {
+    const { message, stack } = err;
+    await writeJson(join(__dirname, "err.json"), {
+      message,
+      stack
+    });
+  }
+});
