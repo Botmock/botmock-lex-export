@@ -10,7 +10,7 @@ interface ProjectVariables {
 
 const BOTMOCK_API_URL = "https://app.botmock.com/api";
 const INTENTS = "intents";
-const ENTITIES = "entities";
+const ENTITIES = "variables";
 const PROJECT = "";
 
 export default async function getProjectData({
@@ -29,7 +29,7 @@ export default async function getProjectData({
           Authorization: `Bearer ${token}`,
         },
       });
-      log(`fetched ${path.match(/[a-z]{6,8}/gi) || "project"}`);
+      log(`fetched ${path.match(/[a-z]{6,9}/gi) || "project"}`);
       if (!res.ok) {
         throw res.status;
       }
