@@ -1,12 +1,4 @@
-import fs from "fs";
-import { execSync } from "child_process";
-import { outputPath } from "../";
+// import { join } from "path";
+// import { remove, readFile, readdir } from "fs-extra";
 
-// afterAll(async done => {});
-
-test("creates json file", () => {
-  execSync("npm start");
-  expect(async () => {
-    await fs.promises.access(outputPath, fs.constants.R_OK);
-  }).not.toThrow();
-});
+test.todo("");

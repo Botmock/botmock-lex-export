@@ -1,8 +1,8 @@
-import fs from "fs";
-import os from "os";
+import { EOL } from "os";
 import uuid from "uuid/v4";
-import { symmetricWrap } from "@botmock-api/utils";
-import { ProjectIntent, ProjectResponse, ResourceIntent } from "./types";
+import { writeFile } from "fs-extra";
+import { wrapEntitiesWithChar } from "@botmock-api/text";
+import * as Assets from "./types";
 
 export { ProjectResponse } from "./types";
 export { default as getProjectData } from "./client";
@@ -20,19 +20,17 @@ const LOCALE = process.env.LOCALE || "en-US";
 const SESSION_TTL_SECS = process.env.SESSION_TTL_SECS || 800;
 
 export async function writeResource(
-  project: Partial<ProjectResponse>,
+  project: Partial<Assets.ProjectResponse>,
   filepath: string
 ): Promise<void> {
   let [intents, entities, messages, { name }] = project.data;
   // because entities are mapped to slot types, if there are no entities, lex
   // will recognize no slot types and fail to import
   if (!entities.length) {
-    entities = [
-      { id: uuid(), name: "AMAZON.TIME", data: [{ value: Date.now() + "" }] },
-    ];
+    entities = [{ id: uuid(), name: "AMAZON.TIME", data: [{ value: Date.now() + "" }] }];
   }
   // map an intent into the object required for the resource
-  const mapIntentToResource = (intent: ProjectIntent): any => {
+  const mapIntentToResource = (intent: Assets.ProjectIntent): object => {
     return {
       description: intent.id,
       rejectionStatement: {
@@ -43,9 +41,7 @@ export async function writeResource(
       fulfillmentActivity: {
         type: "ReturnIntent",
       },
-      sampleUtterances: intent.utterances.map(utterance =>
-        symmetricWrap(utterance.text, { l: "{", r: "}" })
-      ),
+      sampleUtterances: intent.utterances.map(({ text }) => wrapEntitiesWithChar(text, "{")),
       // map over a reduction on unique variable names to create slots
       slots: Object.entries(
         intent.utterances
@@ -126,8 +122,8 @@ export async function writeResource(
       },
       null,
       2
-    ) + os.EOL;
-  await fs.promises.writeFile(filepath, data);
+    ) + EOL;
+  await writeFile(filepath, data);
 }
 
 function getSlotTypes(entities: any[]): any[] {

@@ -1,4 +1,5 @@
 import fetch from "node-fetch";
+import { default as log } from "./log"
 
 interface ProjectVariables {
   projectId?: string;
@@ -28,7 +29,7 @@ export default async function getProjectData({
           Authorization: `Bearer ${token}`,
         },
       });
-      console.info(`${path.match(/[a-z]{6,8}/gi) || "project"} fetched.`);
+      log(`fetched ${path.match(/[a-z]{6,8}/gi) || "project"}`);
       if (!res.ok) {
         throw res.status;
       }
