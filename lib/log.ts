@@ -1,7 +1,7 @@
 import chalk from "chalk";
 
 interface LogConfig {
-  hasError: boolean;
+  readonly isQuiet: boolean;
 }
 
 /**
@@ -9,7 +9,7 @@ interface LogConfig {
  * @param str the string to print
  * @param config object dictating which chalk method to use to print
  */
-export default function log(str: string | number, config: LogConfig = { hasError: false }): void {
-  const method = !config.hasError ? "dim" : "bold";
+export default function log(str: string | number, config: LogConfig = { isQuiet: false }): void {
+  const method = !config.isQuiet ? "dim" : "gray";
   console.info(chalk[method](`> ${str}`));
 }

@@ -49,14 +49,14 @@ async function main(args: string[]): Promise<void> {
     "variables"
   ]);
   log("writing file");
-  // const fileWriter = new FileWriter({
-  //   outputDirectory,
-  //   projectData
-  // });
-  // fileWriter.on("write-complete", ({ basename }) => {
-  //   log(`wrote ${basename}`);
-  // });
-  // await fileWriter.write();
+  const fileWriter = new FileWriter({
+    outputDirectory,
+    projectData
+  });
+  fileWriter.on("write-complete", ({ basename }) => {
+    log(`wrote ${basename}`);
+  });
+  await fileWriter.write();
   log("done");
 }
 
