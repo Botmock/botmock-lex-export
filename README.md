@@ -1,14 +1,27 @@
 # Botmock Lex Export
 
-Generates an [Amazon Lex resource](https://docs.aws.amazon.com/lex/latest/dg/import-from-lex.html) from a Botmock project.
+[![Build Status](https://dev.azure.com/botmock/botmock-lex-export/_apis/build/status/Botmock.botmock-lex-export?branchName=master)](https://dev.azure.com/botmock/botmock-lex-export/_build/latest?definitionId=5&branchName=master)
 
-- Tutorial Video (Coming Soon)
-- Documentation (Coming Soon)
-- [Support Email](mailto:help@botmock.com)
+> create amazon lex [resources]() from botmock projects
 
-<!-- ## ethos -->
+This script produces a `.json` file able to be imported as a resource in the Amazon Lex dashboard.
 
-## prerequisites
+## Table of Contents
+
+* [Overview](#overview)
+  * [Botmock project structure](#botmock-project-structure)
+  * [Approach to importing](#approach-to-importing)
+  * [Prerequisites](#prerequisites)
+    * [nodejs](#nodejs)
+    * [lex](#lex)
+  * [Installation](#installation)
+    * [clone](#clone)
+    * [env](#env)
+  * [Commands](#commands)
+    * [start](#start)
+  * [Importing](#importing)
+
+<!-- ## prerequisites
 
 - [Node.js](https://nodejs.org/en/) >= 12.x
 
@@ -69,4 +82,4 @@ _NOTE: Make sure to leave any sensitive information out of an issue when reporti
 
 ## license
 
-Botmock Lex Export is copyright © 2019 Botmock. It is free software, and may be redistributed under the terms specified in the LICENSE file.
+Botmock Lex Export is copyright © 2019 Botmock. It is free software, and may be redistributed under the terms specified in the LICENSE file. -->
