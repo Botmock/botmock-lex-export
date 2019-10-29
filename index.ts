@@ -64,6 +64,7 @@ process.on("unhandledRejection", () => {});
 process.on("uncaughtException", () => {});
 
 main(process.argv).catch(async (err: Error) => {
+  log(err.stack, { isQuiet: true });
   if (process.env.OPT_IN_ERROR_REPORTING) {
     // Sentry.captureException(err);
   } else {
