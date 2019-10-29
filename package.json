@@ -1,24 +1,19 @@
 {
   "name": "botmock-lex-export",
   "version": "2.0.0",
-  "description": "generate lex resource from botmock project",
-  "main": "index.ts",
-  "module": "index.ts",
+  "description": "generate lex resources from botmock projects",
+  "engines": {
+    "node": ">=12.12.0"
+  },
   "scripts": {
     "test": "jest",
     "start": "ts-node index.ts"
   },
   "keywords": [
     "botmock",
-    "amazon",
     "lex",
     "nodejs"
   ],
-  "prettier": {
-    "trailingComma": "es5",
-    "tabWidth": 2,
-    "printWidth": 80
-  },
   "jest": {
     "preset": "ts-jest",
     "globals": {
@@ -34,11 +29,8 @@
   "license": "MIT",
   "dependencies": {
     "@botmock-api/client": "1.0.0",
-    "@botmock-api/flow": "0.1.0",
+    "@botmock-api/flow": "^0.6.0",
     "@botmock-api/text": "0.2.2",
-    "@botmock-api/utils": "2.2.1",
-    "@sentry/integrations": "5.6.1",
-    "@sentry/node": "5.7.1",
     "chalk": "2.4.2",
     "dotenv": "8.0.0",
     "fs-extra": "8.1.0",
@@ -46,13 +38,13 @@
     "uuid": "3.3.2"
   },
   "devDependencies": {
-    "@types/fs-extra": "8.0.0",
-    "@types/jest": "24.0.15",
-    "@types/node": "12.6.2",
-    "@types/node-fetch": "2.3.7",
-    "jest": "24.8.0",
-    "ts-jest": "^24.0.2",
-    "ts-node": "8.3.0",
-    "typescript": "3.5.3"
+    "@types/fs-extra": "^8.0.1",
+    "@types/jest": "^24.0.20",
+    "@types/node": "^12.11.7",
+    "@types/node-fetch": "^2.5.2",
+    "jest": "^24.9.0",
+    "ts-jest": "^24.1.0",
+    "ts-node": "^8.4.1",
+    "typescript": "^3.6.4"
   }
 }
