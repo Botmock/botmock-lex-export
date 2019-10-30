@@ -33,15 +33,15 @@
     "@botmock-api/flow": "^0.6.0",
     "@botmock-api/text": "0.2.2",
     "chalk": "2.4.2",
-    "dotenv": "8.0.0",
+    "dotenv": "^8.2.0",
     "fs-extra": "8.1.0",
     "node-fetch": "2.6.0",
-    "uuid": "3.3.2"
+    "uuid": "^3.3.3"
   },
   "devDependencies": {
     "@types/fs-extra": "^8.0.1",
     "@types/jest": "^24.0.20",
-    "@types/node": "^12.11.7",
+    "@types/node": "^12.12.0",
     "@types/node-fetch": "^2.5.2",
     "jest": "^24.9.0",
     "ts-jest": "^24.1.0",
