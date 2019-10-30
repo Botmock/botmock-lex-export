@@ -3,3 +3,4 @@ output
 err.json
 node_modules
 npm-debug.log
+*.zip

@@ -94,9 +94,18 @@ export default class FileWriter extends flow.AbstractProject {
    * any referenced amazon system entity; fallsback to custom entity
    */
   private generateIntentsForProject(): Lex.Intents {
-    return this.projectData.intents.map(intent => {
+    const intentsInFlow = Array.from(this.segmentizeBoardFromMessages())
+      .reduce((acc, pair: [string, string[]]) => {
+        const [, idsOfIntents] = pair;
+        return [
+          ...acc,
+          ...idsOfIntents.map(intentId => this.getIntent(intentId))
+        ]
+      }, []);
+    return intentsInFlow.map((intent: flow.Intent) => {
       const description = new Date().toLocaleString();
       const name = this.sanitizeText(intent.name);
+      const responseCard = JSON.stringify({});
       return {
         description,
         name,
@@ -140,7 +149,7 @@ export default class FileWriter extends flow.AbstractProject {
             }
           }),
         conclusionStatement: {
-          responseCard: JSON.stringify({}),
+          responseCard,
           messages: [],
         },
       }
@@ -192,6 +201,7 @@ export default class FileWriter extends flow.AbstractProject {
   public async write(): Promise<void> {
     const { name } = this.projectData.project;
     const resourceData = this.generateResourceForProject();
-    await writeJson(join(this.outputDirectory, `${name}.json`), resourceData, { EOL, spaces: 2 });
+    const filename = join(this.outputDirectory, `${this.sanitizeText(name)}.json`);
+    await writeJson(filename, resourceData, { EOL, spaces: 2 });
   }
 }

@@ -73,15 +73,15 @@ To get your Botmock API token, follow the [guide](http://help.botmock.com/en/art
 
 #### `start`
 
-Populates `/output` with `.json` files produced from your original project.
+Populates `/output` with `.zip` file produced from your original project.
 
 ```shell
+# start the exporter
 npm start
 ```
 
 ### Importing
 
-- Compress the generated `.json` file
 - Visit the Lex console [AWS console](https://console.aws.amazon.com/lex/)
 - Choose **Bots**
 - Choose **Actions**

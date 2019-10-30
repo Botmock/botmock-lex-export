@@ -33,6 +33,7 @@
     "@botmock-api/flow": "^0.6.0",
     "@botmock-api/text": "0.2.2",
     "chalk": "2.4.2",
+    "cross-zip": "^2.1.6",
     "dotenv": "^8.2.0",
     "fs-extra": "8.1.0",
     "node-fetch": "2.6.0",
