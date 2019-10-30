@@ -29,6 +29,7 @@
   "license": "MIT",
   "dependencies": {
     "@botmock-api/client": "1.0.0",
+    "@botmock-api/entity-map": "^0.2.0",
     "@botmock-api/flow": "^0.6.0",
     "@botmock-api/text": "0.2.2",
     "chalk": "2.4.2",

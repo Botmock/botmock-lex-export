@@ -1,11 +1,19 @@
+import { default as findEntity } from "@botmock-api/entity-map";
 import * as flow from "@botmock-api/flow";
 import { writeJson } from "fs-extra";
 import { join } from "path";
 import { EOL } from "os";
 
+export type LexResource = {};
 export type ProjectData<T> = T extends Promise<infer K> ? K : any;
 
-type LexResource = {};
+enum ContentType {
+  text = "PlainText",
+}
+
+enum ObfuscationSettings {
+  none = "NONE"
+}
 
 interface IConfig {
   readonly outputDirectory: string;
@@ -30,18 +38,28 @@ export default class FileWriter extends flow.AbstractProject {
     this.outputDirectory = config.outputDirectory;
   }
   /**
+   * Removes disallowed characters from text
+   * @param text the text to transform
+   */
+  private sanitizeText(text: string): string {
+    const disallowedCharactersRegex = new RegExp(/\s|-|_/g);
+    return text.replace(disallowedCharactersRegex, "");
+  }
+  /**
    * Generates resource object from project data
    * @returns object able to be serialized and written
    */
   private generateResourceDataForProject(): LexResource {
+    const { name } = this.projectData.project;
+    const metadata = {
+      schemaVersion: "1.0",
+      importType: "LEX",
+      importFormat: "JSON",
+    };
     return {
-      metadata: {
-        schemaVersion: "1.0",
-        importType: "LEX",
-        importFormat: "JSON",
-      },
+      metadata,
       resource: {
-        name: "",
+        name: this.sanitizeText(name),
         version: FileWriter.version,
         intents: [],
         slotTypes: [],
