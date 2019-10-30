@@ -66,7 +66,7 @@ export default class FileWriter extends flow.AbstractProject {
    * @param text the text to transform
    */
   private sanitizeText(text: string): string {
-    const disallowedCharactersRegex = new RegExp(/\s|-|_/g);
+    const disallowedCharactersRegex = new RegExp(/\s|-|_|\./g);
     return text.replace(disallowedCharactersRegex, "");
   }
   /**
@@ -118,36 +118,42 @@ export default class FileWriter extends flow.AbstractProject {
       const name = this.sanitizeText(intent.name);
       const connectedMessage = this.getMessage(messageId) as flow.Message;
       const messagesInSegment = this.gatherMessagesUpToNextIntent(connectedMessage);
-      const responseCard = JSON.stringify({
-        version: FileWriter.version,
-        contentType: FileWriter.responseCardContentType,
-        genericAttachments: [
-          connectedMessage,
-          ...messagesInSegment,
-        ]
-          .filter(message => message.message_type === FileWriter.botmockCardType)
-          .reduce((acc, message) => {
-            const { elements } = message.payload;
-            return [
-              ...acc,
-              ...elements.reduce((acc, element: any) => {
-                return [
-                  ...acc,
-                  {
-                    imageUrl: element.image_url,
-                    subTitle: element.subtitle,
-                    title: element.title,
-                    buttons: element.buttons.map((button: any) => ({
-                      text: button.title,
-                      value: button.payload
-                    })),
-                  },
-                ]
-              }, [])
-            ]
-          }, [])
-      });
-      const messages = [connectedMessage, ...messagesInSegment].map(message => message.payload.text);
+      const attachments = [
+        connectedMessage,
+        ...messagesInSegment,
+      ].filter(message => message.message_type === FileWriter.botmockCardType);
+      const responseCard = !attachments.length
+        ? undefined
+        : JSON.stringify({
+          version: FileWriter.version,
+          contentType: FileWriter.responseCardContentType,
+          genericAttachments: attachments
+            .reduce((acc, message) => {
+              const { elements } = message.payload;
+              return [
+                ...acc,
+                ...elements.reduce((acc, element: any) => {
+                  return [
+                    ...acc,
+                    {
+                      imageUrl: element.image_url,
+                      subTitle: element.subtitle,
+                      title: element.title,
+                      buttons: element.buttons.map((button: any) => ({
+                        text: button.title,
+                        value: button.payload
+                      })),
+                    },
+                  ]
+                }, [])
+              ]
+            }, [])
+        });
+      const messages = [connectedMessage, ...messagesInSegment].map((message, index) => ({
+        groupNumber: index + 1,
+        contentType: ContentTypes.text,
+        content: message.payload.text,
+      }));
       return {
         description,
         name,
@@ -155,42 +161,43 @@ export default class FileWriter extends flow.AbstractProject {
         fulfillmentActivity: {
           type: FulfillmentActivityTypes.return,
         },
-        sampleUtterances: intent.utterances.map(utterance => (
-          wrapEntitiesWithChar(utterance.text, "{")
-        )),
-        slots: Object.is(intent.slots, null)
-          ? []
+        sampleUtterances: !intent.utterances.length
+          ? undefined
+          : intent.utterances.map((utterance: any) => (
+            wrapEntitiesWithChar(utterance.text, "{")
+          )),
+        slots: Object.is(intent.slots, null) || !intent.slots.length
+          ? undefined
           : intent.slots.map((slot: flow.Slot, index: number) => {
             const variable = this.getVariable(slot.variable_id) as flow.Variable;
             let slotType: string;
+            let didUseCustomEntity = false;
             try {
               slotType = findEntity(variable.entity, { platform: "amazon" }) as string;
             } catch (_) {
               const { name: customEntityName } = this.getEntity(variable.entity) as flow.Entity;
+              didUseCustomEntity = true;
               slotType = customEntityName;
             }
-            const slotConstraint = slot.is_required
-              ? SlotConstraints.required
-              : undefined;
             return {
-              sampleUtterances: [],
+              // sampleUtterances: [],
               slotType,
-              slotTypeVersion: FileWriter.slotTypeVersion,
+              slotTypeVersion: !didUseCustomEntity ? undefined : FileWriter.slotTypeVersion,
               obfuscationSetting: ObfuscationSettings.none,
-              slotConstraint,
-              valueElicitationPrompt: {
-                messages: !slot.prompt
-                  ? []
-                  : [
-                      {
-                        contentType: ContentTypes.text,
-                        content: wrapEntitiesWithChar(slot.prompt, "{"),
-                      },
-                    ],
-                maxAttempts: FileWriter.maxValueElicitationAttempts,
+              slotConstraint: SlotConstraints.required,
+              valueElicitationPrompt: !slot.prompt
+                ? undefined
+                : {
+                  messages: [
+                    {
+                      contentType: ContentTypes.text,
+                      content: wrapEntitiesWithChar(slot.prompt, "{"),
+                    },
+                  ],
+                  maxAttempts: FileWriter.maxValueElicitationAttempts,
               },
               priority: index + 1,
-              name: slot.id,
+              name: this.sanitizeText(slotType.toLowerCase()),
               description: new Date().toLocaleString(),
             }
           }),
@@ -219,7 +226,7 @@ export default class FileWriter extends flow.AbstractProject {
         name: this.sanitizeText(name),
         version: FileWriter.version,
         intents: this.generateIntentsForProject(),
-        slotTypes: this.generateSlotTypesForProject(),
+        // slotTypes: this.generateSlotTypesForProject(),
         voiceId: FileWriter.voiceId,
         childDirected: FileWriter.isChildDirected,
         locale: FileWriter.locale,
@@ -230,7 +237,7 @@ export default class FileWriter extends flow.AbstractProject {
             contentType: ContentTypes.text,
             content: FileWriter.clarificationPrompt,
           }],
-          maxAttempts: 2,
+          maxAttempts: FileWriter.maxValueElicitationAttempts,
         },
         abortStatement: {
           messages: [{
