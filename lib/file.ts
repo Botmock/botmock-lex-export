@@ -1,4 +1,4 @@
-// import { default as findEntity } from "@botmock-api/entity-map";
+import { default as findEntity } from "@botmock-api/entity-map";
 import { wrapEntitiesWithChar } from "@botmock-api/text";
 import * as flow from "@botmock-api/flow";
 import { writeJson } from "fs-extra";
@@ -68,6 +68,13 @@ export default class FileWriter extends flow.AbstractProject {
     return text.replace(disallowedCharactersRegex, "");
   }
   /**
+   * Gets full entity from a entity id
+   * @param entityId id of the entity to find
+   */
+  private getEntity(entityId: string): unknown {
+    return this.projectData.entities.find(entity => entity.id === entityId);
+  }
+  /**
    * Gets full variable from a variable id
    * @param variableId id of the variable to find
    */
@@ -102,28 +109,34 @@ export default class FileWriter extends flow.AbstractProject {
         slots: Object.is(intent.slots, null)
           ? []
           : intent.slots.map((slot, index) => {
-              const variable = this.getVariable(slot.variable_id);
-              const slotType = "";
-              const slotConstraint = slot.is_required
-                ? SlotConstraints.required
-                : undefined;
-              return {
-                sampleUtterances: [],
-                slotType,
-                slotTypeVersion: FileWriter.slotTypeVersion,
-                obfuscationSetting: ObfuscationSettings.none,
-                slotConstraint,
-                valueElicitationPrompt: {
-                  messages: [{
-                    contentType: ContentTypes.text,
-                    content: wrapEntitiesWithChar(slot.prompt, "{"),
-                  }],
-                  maxAttempts: FileWriter.maxValueElicitationAttempts,
-                },
-                priority: index + 1,
-                name: slot.id,
-                description: new Date().toLocaleString(),
-              }
+            const variable = this.getVariable(slot.variable_id) as flow.Variable;
+            let slotType: string;
+            try {
+              slotType = findEntity(variable.entity, { platform: "amazon" }) as string;
+            } catch (_) {
+              const { name: customEntityName } = this.getEntity(variable.entity) as flow.Entity;
+              slotType = name;
+            }
+            const slotConstraint = slot.is_required
+              ? SlotConstraints.required
+              : undefined;
+            return {
+              sampleUtterances: [],
+              slotType,
+              slotTypeVersion: FileWriter.slotTypeVersion,
+              obfuscationSetting: ObfuscationSettings.none,
+              slotConstraint,
+              valueElicitationPrompt: {
+                messages: [{
+                  contentType: ContentTypes.text,
+                  content: wrapEntitiesWithChar(slot.prompt, "{"),
+                }],
+                maxAttempts: FileWriter.maxValueElicitationAttempts,
+              },
+              priority: index + 1,
+              name: slot.id,
+              description: new Date().toLocaleString(),
+            }
           }),
         conclusionStatement: {
           responseCard: JSON.stringify({}),
