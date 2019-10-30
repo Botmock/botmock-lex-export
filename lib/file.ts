@@ -90,7 +90,8 @@ export default class FileWriter extends flow.AbstractProject {
   /**
    * Genereates lex intents from the original project
    * 
-   * @remarks ..
+   * @remarks if there are slots for an intent, tries to identify
+   * any referenced amazon system entity; fallsback to custom entity
    */
   private generateIntentsForProject(): Lex.Intents {
     return this.projectData.intents.map(intent => {
@@ -115,7 +116,7 @@ export default class FileWriter extends flow.AbstractProject {
               slotType = findEntity(variable.entity, { platform: "amazon" }) as string;
             } catch (_) {
               const { name: customEntityName } = this.getEntity(variable.entity) as flow.Entity;
-              slotType = name;
+              slotType = customEntityName;
             }
             const slotConstraint = slot.is_required
               ? SlotConstraints.required
