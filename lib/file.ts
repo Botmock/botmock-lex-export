@@ -87,7 +87,13 @@ export default class FileWriter extends flow.AbstractProject {
    * Genereates lex intents from the original project
    */
   private generateSlotTypesForProject(): Lex.Slots {
-    return [];
+    return this.projectData.entities.map(entity => ({
+      description: entity.id,
+      name: entity.name,
+      version: FileWriter.version,
+      enumerationValues: entity.data.map((datapoint: any) => ({ value: datapoint.value })),
+      valueSelectionStrategy: ValueSelectionStrategies.original,
+    }));
   }
   /**
    * Genereates lex intents from the original project
