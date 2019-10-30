@@ -48,14 +48,14 @@ export default class FileWriter extends flow.AbstractProject {
   static version = "1";
   static intentVersion = "2";
   static slotTypeVersion = "1";
-  static maxValueElicitationAttempts = 2;
+  static maxValueElicitationAttempts = 5;
   static sessionTTLSecs = 800;
   static isChildDirected = false;
   private outputDirectory: string;
 /**
  * Creates new instance of FileWriter class
  *
- * @param config Object containing project data and path to output directory
+ * @param config object containing project data and path to output directory
  */
   constructor(config: IConfig) {
     super({ projectData: config.projectData as ProjectData<typeof config.projectData> });
@@ -168,26 +168,26 @@ export default class FileWriter extends flow.AbstractProject {
           )),
         slots: Object.is(intent.slots, null) || !intent.slots.length
           ? undefined
-          : intent.slots.map((slot: flow.Slot, index: number) => {
-            const variable = this.getVariable(slot.variable_id) as flow.Variable;
-            let slotType: string;
-            let didUseCustomEntity = false;
-            try {
-              slotType = findEntity(variable.entity, { platform: "amazon" }) as string;
-            } catch (_) {
-              const { name: customEntityName } = this.getEntity(variable.entity) as flow.Entity;
-              didUseCustomEntity = true;
-              slotType = customEntityName;
-            }
-            return {
-              // sampleUtterances: [],
-              slotType,
-              slotTypeVersion: !didUseCustomEntity ? undefined : FileWriter.slotTypeVersion,
-              obfuscationSetting: ObfuscationSettings.none,
-              slotConstraint: SlotConstraints.required,
-              valueElicitationPrompt: !slot.prompt
-                ? undefined
-                : {
+          : intent.slots
+            .filter((slot: flow.Slot) => slot.is_required)
+            .map((slot: flow.Slot, index: number) => {
+              const variable = this.getVariable(slot.variable_id) as flow.Variable;
+              let slotType: string;
+              let didUseCustomEntity = false;
+              try {
+                slotType = findEntity(variable.entity, { platform: "amazon" }) as string;
+              } catch (_) {
+                const { name: customEntityName } = this.getEntity(variable.entity) as flow.Entity;
+                didUseCustomEntity = true;
+                slotType = customEntityName;
+              }
+              return {
+                // sampleUtterances: [],
+                slotType,
+                slotTypeVersion: !didUseCustomEntity ? undefined : FileWriter.slotTypeVersion,
+                obfuscationSetting: ObfuscationSettings.none,
+                slotConstraint: SlotConstraints.required,
+                valueElicitationPrompt: {
                   messages: [
                     {
                       contentType: ContentTypes.text,
@@ -195,12 +195,12 @@ export default class FileWriter extends flow.AbstractProject {
                     },
                   ],
                   maxAttempts: FileWriter.maxValueElicitationAttempts,
-              },
-              priority: index + 1,
-              name: variable.name,
-              description: new Date().toLocaleString(),
-            }
-          }),
+                },
+                priority: index + 1,
+                name: variable.name,
+                description: new Date().toLocaleString(),
+              }
+            }),
         conclusionStatement: {
           responseCard,
           messages,
