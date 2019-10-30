@@ -43,7 +43,7 @@ export default class FileWriter extends flow.AbstractProject {
   static clarificationPrompt = "I didn't understand you, what would you like me to do?";
   static abortStatement = "Sorry, I am not able to assist at this time";
   static responseCardContentType = "application/vnd.amazonaws.card.generic";
-  static voiceId = "Salli";
+  static voiceId = "Joanna";
   static locale = "en-US";
   static version = "1";
   static intentVersion = "2";
@@ -152,7 +152,7 @@ export default class FileWriter extends flow.AbstractProject {
       const messages = [connectedMessage, ...messagesInSegment].map((message, index) => ({
         groupNumber: index + 1,
         contentType: ContentTypes.text,
-        content: message.payload.text,
+        content: wrapEntitiesWithChar(message.payload.text, "{"),
       }));
       return {
         description,
@@ -197,7 +197,7 @@ export default class FileWriter extends flow.AbstractProject {
                   maxAttempts: FileWriter.maxValueElicitationAttempts,
               },
               priority: index + 1,
-              name: this.sanitizeText(slotType.toLowerCase()),
+              name: variable.name,
               description: new Date().toLocaleString(),
             }
           }),
@@ -226,7 +226,7 @@ export default class FileWriter extends flow.AbstractProject {
         name: this.sanitizeText(name),
         version: FileWriter.version,
         intents: this.generateIntentsForProject(),
-        // slotTypes: this.generateSlotTypesForProject(),
+        slotTypes: this.generateSlotTypesForProject(),
         voiceId: FileWriter.voiceId,
         childDirected: FileWriter.isChildDirected,
         locale: FileWriter.locale,
