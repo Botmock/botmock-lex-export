@@ -39,8 +39,10 @@ interface IConfig {
 }
 
 export default class FileWriter extends flow.AbstractProject {
+  static botmockCardType = "generic";
   static clarificationPrompt = "I didn't understand you, what would you like me to do?";
   static abortStatement = "Sorry, I am not able to assist at this time";
+  static responseCardContentType = "application/vnd.amazonaws.card.generic";
   static voiceId = "Salli";
   static locale = "en-US";
   static version = "1";
@@ -96,16 +98,50 @@ export default class FileWriter extends flow.AbstractProject {
   private generateIntentsForProject(): Lex.Intents {
     const intentsInFlow = Array.from(this.segmentizeBoardFromMessages())
       .reduce((acc, pair: [string, string[]]) => {
-        const [, idsOfIntents] = pair;
+        const [idOfMessage, idsOfIntents] = pair;
         return [
           ...acc,
-          ...idsOfIntents.map(intentId => this.getIntent(intentId))
+          ...idsOfIntents.map(intentId => ({
+            intent: this.getIntent(intentId),
+            messageId: idOfMessage,
+          }))
         ]
       }, []);
-    return intentsInFlow.map((intent: flow.Intent) => {
+    return intentsInFlow.map(({ intent, messageId }: { [key: string]: any }) => {
       const description = new Date().toLocaleString();
       const name = this.sanitizeText(intent.name);
-      const responseCard = JSON.stringify({});
+      const connectedMessage = this.getMessage(messageId) as flow.Message;
+      const messagesInSegment = this.gatherMessagesUpToNextIntent(connectedMessage);
+      const responseCard = JSON.stringify({
+        version: FileWriter.version,
+        contentType: FileWriter.responseCardContentType,
+        genericAttachments: [
+          connectedMessage,
+          ...messagesInSegment,
+        ]
+          .filter(message => message.message_type === FileWriter.botmockCardType)
+          .reduce((acc, message) => {
+            const { elements } = message.payload;
+            return [
+              ...acc,
+              ...elements.reduce((acc, element: any) => {
+                return [
+                  ...acc,
+                  {
+                    imageUrl: element.image_url,
+                    subTitle: element.subtitle,
+                    title: element.title,
+                    buttons: element.buttons.map((button: any) => ({
+                      text: button.title,
+                      value: button.payload
+                    })),
+                  },
+                ]
+              }, [])
+            ]
+          }, [])
+      });
+      const messages = [connectedMessage, ...messagesInSegment].map(message => message.payload.text);
       return {
         description,
         name,
@@ -118,7 +154,7 @@ export default class FileWriter extends flow.AbstractProject {
         )),
         slots: Object.is(intent.slots, null)
           ? []
-          : intent.slots.map((slot, index) => {
+          : intent.slots.map((slot: flow.Slot, index: number) => {
             const variable = this.getVariable(slot.variable_id) as flow.Variable;
             let slotType: string;
             try {
@@ -137,10 +173,14 @@ export default class FileWriter extends flow.AbstractProject {
               obfuscationSetting: ObfuscationSettings.none,
               slotConstraint,
               valueElicitationPrompt: {
-                messages: [{
-                  contentType: ContentTypes.text,
-                  content: wrapEntitiesWithChar(slot.prompt, "{"),
-                }],
+                messages: !slot.prompt
+                  ? []
+                  : [
+                      {
+                        contentType: ContentTypes.text,
+                        content: wrapEntitiesWithChar(slot.prompt, "{"),
+                      },
+                    ],
                 maxAttempts: FileWriter.maxValueElicitationAttempts,
               },
               priority: index + 1,
@@ -150,7 +190,7 @@ export default class FileWriter extends flow.AbstractProject {
           }),
         conclusionStatement: {
           responseCard,
-          messages: [],
+          messages,
         },
       }
     });
