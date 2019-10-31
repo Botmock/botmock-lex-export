@@ -152,7 +152,7 @@ export default class FileWriter extends flow.AbstractProject {
       const messages = [connectedMessage, ...messagesInSegment].map((message, index) => ({
         groupNumber: index + 1,
         contentType: ContentTypes.text,
-        content: wrapEntitiesWithChar(message.payload.text, "{"),
+        content: wrapEntitiesWithChar(message.payload.text || FileWriter.botmockCardType, "{"),
       }));
       return {
         description,

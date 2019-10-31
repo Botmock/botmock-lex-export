@@ -13,3 +13,8 @@ describe("run", () => {
     expect(res.toString().split(EOL).length).toBeGreaterThanOrEqual(9);
   });
 });
+
+describe("generated file", () => {
+  test.todo("file contains all necessary fields");
+  test.todo("file contains correct types for all necessary fields");
+});
