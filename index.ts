@@ -2,9 +2,9 @@ import "dotenv/config";
 import { join } from "path";
 import { zipSync } from "cross-zip";
 import { Batcher } from "@botmock-api/client";
+import { default as log } from "@botmock-api/log";
 import { writeJson, remove, mkdirp } from "fs-extra";
 import { default as FileWriter } from "./lib/file";
-import { default as log } from "./lib/log";
 
 interface Paths {
   readonly outputPath: string;
@@ -70,7 +70,7 @@ process.on("unhandledRejection", () => {});
 process.on("uncaughtException", () => {});
 
 main(process.argv).catch(async (err: Error) => {
-  log(err.stack, { isQuiet: true });
+  log(err.stack, { isError: true });
   if (process.env.OPT_IN_ERROR_REPORTING) {
     // Sentry.captureException(err);
   } else {
