@@ -175,7 +175,8 @@ export default class FileWriter extends flow.AbstractProject {
               let slotType: string;
               let didUseCustomEntity = false;
               try {
-                slotType = findEntity(variable.entity, { platform: "amazon" }) as string;
+                const entityName = variable.entity.replace(/^botmock\./, "");
+                slotType = findEntity(entityName, { platform: "amazon" }) as string;
               } catch (_) {
                 const { name: customEntityName } = this.getEntity(variable.entity) as flow.Entity;
                 didUseCustomEntity = true;
