@@ -82,6 +82,7 @@ npm start
 
 ### Importing
 
+- Compress the generated `.json` file
 - Visit the Lex console [AWS console](https://console.aws.amazon.com/lex/)
 - Choose **Bots**
 - Choose **Actions**

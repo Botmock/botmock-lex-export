@@ -9,26 +9,21 @@ namespace Lex {
   export interface Resource {};
   export type Intents = unknown[];
   export type Slots = unknown[];
-}
-
-enum ContentTypes {
-  text = "PlainText",
-}
-
-enum ObfuscationSettings {
-  none = "NONE",
-}
-
-enum SlotConstraints {
-  required = "Required",
-}
-
-enum ValueSelectionStrategies {
-  original = "ORIGINAL_VALUE",
-}
-
-enum FulfillmentActivityTypes {
-  return = "ReturnIntent",
+  export enum ContentTypes {
+    text = "PlainText",
+  }
+  export enum ObfuscationSettings {
+    none = "NONE",
+  }
+  export enum SlotConstraints {
+    required = "Required",
+  }
+  export enum ValueSelectionStrategies {
+    original = "ORIGINAL_VALUE",
+  }
+  export enum FulfillmentActivityTypes {
+    return = "ReturnIntent",
+  }
 }
 
 export type ProjectData<T> = T extends Promise<infer K> ? K : any;
@@ -92,7 +87,7 @@ export default class FileWriter extends flow.AbstractProject {
       name: entity.name,
       version: FileWriter.version,
       enumerationValues: entity.data.map((datapoint: any) => ({ value: datapoint.value })),
-      valueSelectionStrategy: ValueSelectionStrategies.original,
+      valueSelectionStrategy: Lex.ValueSelectionStrategies.original,
     }));
   }
   /**
@@ -151,7 +146,7 @@ export default class FileWriter extends flow.AbstractProject {
         });
       const messages = [connectedMessage, ...messagesInSegment].map((message, index) => ({
         groupNumber: index + 1,
-        contentType: ContentTypes.text,
+        contentType: Lex.ContentTypes.text,
         content: wrapEntitiesWithChar(message.payload.text || FileWriter.botmockCardType, "{"),
       }));
       return {
@@ -159,7 +154,7 @@ export default class FileWriter extends flow.AbstractProject {
         name,
         version: FileWriter.intentVersion,
         fulfillmentActivity: {
-          type: FulfillmentActivityTypes.return,
+          type: Lex.FulfillmentActivityTypes.return,
         },
         sampleUtterances: !intent.utterances.length
           ? undefined
@@ -186,12 +181,12 @@ export default class FileWriter extends flow.AbstractProject {
                 // sampleUtterances: [],
                 slotType,
                 slotTypeVersion: !didUseCustomEntity ? undefined : FileWriter.slotTypeVersion,
-                obfuscationSetting: ObfuscationSettings.none,
-                slotConstraint: SlotConstraints.required,
+                obfuscationSetting: Lex.ObfuscationSettings.none,
+                slotConstraint: Lex.SlotConstraints.required,
                 valueElicitationPrompt: {
                   messages: [
                     {
-                      contentType: ContentTypes.text,
+                      contentType: Lex.ContentTypes.text,
                       content: wrapEntitiesWithChar(slot.prompt, "{"),
                     },
                   ],
@@ -235,14 +230,14 @@ export default class FileWriter extends flow.AbstractProject {
         description,
         clarificationPrompt: {
           messages: [{
-            contentType: ContentTypes.text,
+            contentType: Lex.ContentTypes.text,
             content: FileWriter.clarificationPrompt,
           }],
           maxAttempts: FileWriter.maxValueElicitationAttempts,
         },
         abortStatement: {
           messages: [{
-            contentType: ContentTypes.text,
+            contentType: Lex.ContentTypes.text,
             content: FileWriter.abortStatement,
           }],
         },

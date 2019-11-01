@@ -1,6 +1,5 @@
 import "dotenv/config";
 import { join } from "path";
-import { zipSync } from "cross-zip";
 import { Batcher } from "@botmock-api/client";
 import { default as log } from "@botmock-api/log";
 import { writeJson, remove, mkdirp } from "fs-extra";
@@ -58,12 +57,7 @@ async function main(args: string[]): Promise<void> {
     log(`wrote ${basename}`);
   });
   await fileWriter.write();
-  try {
-    zipSync(outputDirectory, `${outputDirectory}.zip`);
-    log(`${outputDirectory}.zip is ready to be imported in the Amazon Lex console`);
-  } finally {
-    log("done");
-  }
+  log("done");
 }
 
 process.on("unhandledRejection", () => {});
