@@ -1,8 +1,8 @@
 # Botmock Lex Export
 
-[![Build Status](https://dev.azure.com/botmock/botmock-lex-export/_apis/build/status/Botmock.botmock-lex-export?branchName=master)](https://dev.azure.com/botmock/botmock-lex-export/_build/latest?definitionId=5&branchName=master)
+[![Build Status](https://dev.azure.com/botmock/botmock-lex-exporter/_apis/build/status/Botmock.botmock-lex-export?branchName=master)](https://dev.azure.com/botmock/botmock-lex-exporter/_build/latest?definitionId=7&branchName=master)
 
-> create amazon lex [resources]() from botmock projects
+> create amazon lex [resources](https://docs.aws.amazon.com/IAM/latest/UserGuide/list_amazonlex.html#amazonlex-resources-for-iam-policies) from botmock projects
 
 This script produces a `.json` file able to be imported as a resource in the Amazon Lex dashboard.
 
