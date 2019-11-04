@@ -25,7 +25,7 @@ This script produces a `.json` file able to be imported as a resource in the Ama
 
 ### Botmock project structure
 
-### Approach to importing
+When designing a project, the main thing to keep in mind is that intents on connectors are responsible for breaking up the flow into the different intents recognized by Lex. Messages between connectors that have intents are treated as messages or response cards within the same Lex intent.
 
 ### Prerequisites
 
