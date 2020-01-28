@@ -1,9 +1,20 @@
 import "dotenv/config";
 import { join } from "path";
+import { zipSync } from "cross-zip";
 import { Batcher } from "@botmock-api/client";
 import { default as log } from "@botmock-api/log";
 import { writeJson, remove, mkdirp } from "fs-extra";
 import { default as FileWriter } from "./lib/file";
+
+enum Platforms {
+  AIX = "aix",
+  DARWIN = "darwin",
+  BSD = "freebsd",
+  LINUX = "linux",
+  OPEN_BSD = "openbsd",
+  SUN_OS = "sunos",
+  WIN = "win32",
+}
 
 interface Paths {
   readonly outputPath: string;
@@ -56,6 +67,13 @@ async function main(args: string[]): Promise<void> {
     log(`wrote ${basename}`);
   });
   await fileWriter.write();
+  log("compressing generated files");
+  if (process.platform === Platforms.DARWIN) {
+    zipSync(outputDirectory, `${outputDirectory}.zip`);
+    log(`${outputDirectory}.zip is ready to be imported in the Lex console`);
+  } else {
+    log(`auto-compression not yet supported for ${process.platform}`);
+  }
   log("done");
 }
 
