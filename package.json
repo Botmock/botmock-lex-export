@@ -42,11 +42,11 @@
   "devDependencies": {
     "@types/fs-extra": "^8.0.1",
     "@types/jest": "^24.0.21",
-    "@types/node": "^12.12.3",
+    "@types/node": "^13.5.0",
     "@types/node-fetch": "^2.5.2",
     "jest": "^24.9.0",
     "ts-jest": "^24.1.0",
-    "ts-node": "^8.4.1",
-    "typescript": "^3.6.4"
+    "ts-node": "^8.6.2",
+    "typescript": "^3.7.5"
   }
 }

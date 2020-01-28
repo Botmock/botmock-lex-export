@@ -6,7 +6,7 @@ import { join } from "path";
 import { EOL } from "os";
 
 namespace Lex {
-  export interface Resource {};
+  export interface Resource { };
   export type Intents = unknown[];
   export type Slots = unknown[];
   export enum ContentTypes {
@@ -47,11 +47,11 @@ export default class FileWriter extends flow.AbstractProject {
   static sessionTTLSecs = 800;
   static isChildDirected = false;
   private outputDirectory: string;
-/**
- * Creates new instance of FileWriter class
- *
- * @param config object containing project data and path to output directory
- */
+  /**
+   * Creates new instance of FileWriter class
+   *
+   * @param config object containing project data and path to output directory
+   */
   constructor(config: IConfig) {
     super({ projectData: config.projectData as ProjectData<typeof config.projectData> });
     this.outputDirectory = config.outputDirectory;
@@ -92,7 +92,6 @@ export default class FileWriter extends flow.AbstractProject {
   }
   /**
    * Genereates lex intents from the original project
-   * 
    * @remarks if there are slots for an intent, tries to identify
    * any referenced amazon system entity; fallsback to custom entity
    */
@@ -106,11 +105,12 @@ export default class FileWriter extends flow.AbstractProject {
             intent: this.getIntent(intentId),
             messageId: idOfMessage,
           }))
-        ]
+        ];
       }, []);
-    return intentsInFlow.map(({ intent, messageId }: { [key: string]: any }) => {
+    return intentsInFlow.map(({ intent = {}, messageId }: { [key: string]: any; }) => {
       const description = new Date().toLocaleString();
-      const name = this.sanitizeText(intent.name);
+      const { name: intentName, slots = [], utterances = [] } = intent ?? {};
+      const name = this.sanitizeText(intentName ?? "");
       const connectedMessage = this.getMessage(messageId) as flow.Message;
       const messagesInSegment = this.gatherMessagesUpToNextIntent(connectedMessage);
       const attachments = [
@@ -139,9 +139,9 @@ export default class FileWriter extends flow.AbstractProject {
                         value: button.payload
                       })),
                     },
-                  ]
+                  ];
                 }, [])
-              ]
+              ];
             }, [])
         });
       const messages = [connectedMessage, ...messagesInSegment].map((message, index) => ({
@@ -156,12 +156,12 @@ export default class FileWriter extends flow.AbstractProject {
         fulfillmentActivity: {
           type: Lex.FulfillmentActivityTypes.return,
         },
-        sampleUtterances: !intent.utterances.length
+        sampleUtterances: !utterances.length
           ? undefined
           : intent.utterances.map((utterance: any) => (
             wrapEntitiesWithChar(utterance.text, "{")
           )),
-        slots: Object.is(intent.slots, null) || !intent.slots.length
+        slots: Object.is(slots, null) || !slots.length
           ? undefined
           : intent.slots
             .filter((slot: flow.Slot) => slot.is_required)
@@ -195,13 +195,13 @@ export default class FileWriter extends flow.AbstractProject {
                 priority: index + 1,
                 name: variable.name,
                 description: new Date().toLocaleString(),
-              }
+              };
             }),
         conclusionStatement: {
           responseCard,
           messages,
         },
-      }
+      };
     });
   }
   /**
@@ -242,7 +242,7 @@ export default class FileWriter extends flow.AbstractProject {
           }],
         },
       }
-    }
+    };
   }
   /**
    * Writes lex resource file
