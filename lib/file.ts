@@ -4,38 +4,17 @@ import * as flow from "@botmock-api/flow";
 import { writeJson } from "fs-extra";
 import { join } from "path";
 import { EOL } from "os";
-
-namespace Lex {
-  export interface Resource {};
-  export type Intents = unknown[];
-  export type Slots = unknown[];
-  export enum ContentTypes {
-    text = "PlainText",
-  }
-  export enum ObfuscationSettings {
-    none = "NONE",
-  }
-  export enum SlotConstraints {
-    required = "Required",
-  }
-  export enum ValueSelectionStrategies {
-    original = "ORIGINAL_VALUE",
-  }
-  export enum FulfillmentActivityTypes {
-    return = "ReturnIntent",
-  }
-}
-
-export type ProjectData<T> = T extends Promise<infer K> ? K : any;
+import { notDeepStrictEqual } from "assert";
+import { ProjectData, Lex } from "./types";
 
 interface IConfig {
   readonly outputDirectory: string;
   readonly projectData: ProjectData<unknown>;
 }
 
-export default class FileWriter extends flow.AbstractProject {
+export default class FileWriter<S extends object> extends flow.AbstractProject {
   static botmockCardType = "generic";
-  static clarificationPrompt = "I didn't understand you, what would you like me to do?";
+  static clarificationPrompt = "I didn't understand you, what would you like me to do";
   static abortStatement = "Sorry, I am not able to assist at this time";
   static responseCardContentType = "application/vnd.amazonaws.card.generic";
   static voiceId = "Joanna";
@@ -47,18 +26,15 @@ export default class FileWriter extends flow.AbstractProject {
   static sessionTTLSecs = 800;
   static isChildDirected = false;
   private outputDirectory: string;
-/**
- * Creates new instance of FileWriter class
- *
- * @param config object containing project data and path to output directory
- */
+  /**
+   * Creates new instance of FileWriter class
+   */
   constructor(config: IConfig) {
     super({ projectData: config.projectData as ProjectData<typeof config.projectData> });
     this.outputDirectory = config.outputDirectory;
   }
   /**
    * Removes disallowed characters from text
-   * @param text the text to transform
    */
   private sanitizeText(text: string): string {
     const disallowedCharactersRegex = new RegExp(/\s|-|_|\./g);
@@ -84,7 +60,7 @@ export default class FileWriter extends flow.AbstractProject {
   private generateSlotTypesForProject(): Lex.Slots {
     return this.projectData.entities.map(entity => ({
       description: entity.id,
-      name: entity.name,
+      name: this.sanitizeText(entity.name),
       version: FileWriter.version,
       enumerationValues: entity.data.map((datapoint: any) => ({ value: datapoint.value })),
       valueSelectionStrategy: Lex.ValueSelectionStrategies.original,
@@ -92,25 +68,32 @@ export default class FileWriter extends flow.AbstractProject {
   }
   /**
    * Genereates lex intents from the original project
-   * 
    * @remarks if there are slots for an intent, tries to identify
    * any referenced amazon system entity; fallsback to custom entity
    */
   private generateIntentsForProject(): Lex.Intents {
     const intentsInFlow = Array.from(this.segmentizeBoardFromMessages())
-      .reduce((acc, pair: [string, string[]]) => {
+      .reduce((acc, pair: [string, string[]]): any => {
         const [idOfMessage, idsOfIntents] = pair;
         return [
           ...acc,
-          ...idsOfIntents.map(intentId => ({
-            intent: this.getIntent(intentId),
-            messageId: idOfMessage,
-          }))
-        ]
+          ...idsOfIntents
+            .map(intentId => ({
+              intent: this.getIntent(intentId),
+              messageId: idOfMessage,
+            }))
+            .filter(intent => !!intent.intent)
+        ];
       }, []);
-    return intentsInFlow.map(({ intent, messageId }: { [key: string]: any }) => {
-      const description = new Date().toLocaleString();
-      const name = this.sanitizeText(intent.name);
+    return intentsInFlow.map(({ intent = {}, messageId }: { [key: string]: any; }) => {
+      const { name: intentName, slots = [], utterances = [] } = intent ?? {};
+      const name = this.sanitizeText(intentName ?? "");
+      try {
+        notDeepStrictEqual(name, "");
+      } catch (err) {
+        console.log(`missing name for intent: ${intent.id}`);
+        process.exit(1);
+      }
       const connectedMessage = this.getMessage(messageId) as flow.Message;
       const messagesInSegment = this.gatherMessagesUpToNextIntent(connectedMessage);
       const attachments = [
@@ -123,11 +106,11 @@ export default class FileWriter extends flow.AbstractProject {
           version: FileWriter.version,
           contentType: FileWriter.responseCardContentType,
           genericAttachments: attachments
-            .reduce((acc, message) => {
-              const { elements } = message.payload;
+            .reduce((acc, message): any => {
+              const { elements } = message.payload as any;
               return [
                 ...acc,
-                ...elements.reduce((acc, element: any) => {
+                ...elements.reduce((acc: any, element: any) => {
                   return [
                     ...acc,
                     {
@@ -139,29 +122,29 @@ export default class FileWriter extends flow.AbstractProject {
                         value: button.payload
                       })),
                     },
-                  ]
+                  ];
                 }, [])
-              ]
+              ];
             }, [])
         });
       const messages = [connectedMessage, ...messagesInSegment].map((message, index) => ({
         groupNumber: index + 1,
         contentType: Lex.ContentTypes.text,
-        content: wrapEntitiesWithChar(message.payload.text || FileWriter.botmockCardType, "{"),
+        content: wrapEntitiesWithChar((message.payload as any).text || FileWriter.botmockCardType, "{").replace(/\?|!/g, ""),
       }));
       return {
-        description,
+        description: "",
         name,
         version: FileWriter.intentVersion,
         fulfillmentActivity: {
           type: Lex.FulfillmentActivityTypes.return,
         },
-        sampleUtterances: !intent.utterances.length
+        sampleUtterances: !utterances.length
           ? undefined
           : intent.utterances.map((utterance: any) => (
             wrapEntitiesWithChar(utterance.text, "{")
           )),
-        slots: Object.is(intent.slots, null) || !intent.slots.length
+        slots: Object.is(slots, null) || !slots.length
           ? undefined
           : intent.slots
             .filter((slot: flow.Slot) => slot.is_required)
@@ -187,7 +170,7 @@ export default class FileWriter extends flow.AbstractProject {
                   messages: [
                     {
                       contentType: Lex.ContentTypes.text,
-                      content: wrapEntitiesWithChar(slot.prompt, "{"),
+                      content: wrapEntitiesWithChar(slot.prompt, "{").replace(/\?|!/g, ""),
                     },
                   ],
                   maxAttempts: FileWriter.maxValueElicitationAttempts,
@@ -195,13 +178,13 @@ export default class FileWriter extends flow.AbstractProject {
                 priority: index + 1,
                 name: variable.name,
                 description: new Date().toLocaleString(),
-              }
+              };
             }),
         conclusionStatement: {
           responseCard,
           messages,
         },
-      }
+      };
     });
   }
   /**
@@ -242,7 +225,7 @@ export default class FileWriter extends flow.AbstractProject {
           }],
         },
       }
-    }
+    };
   }
   /**
    * Writes lex resource file

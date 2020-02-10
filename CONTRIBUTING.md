@@ -13,4 +13,4 @@ _NOTE: Make sure to leave any sensitive information out of an issue when reporti
 
 ## license
 
-Botmock Lex Export is copyright © 2019 Botmock. It is free software, and may be redistributed under the terms specified in the LICENSE file.
+Botmock Lex Export is copyright © 2020 Botmock. It is free software, and may be redistributed under the terms specified in the LICENSE file.
