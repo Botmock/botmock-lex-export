@@ -5,7 +5,7 @@ import { Batcher } from "@botmock-api/client";
 import { default as log } from "@botmock-api/log";
 import { writeJson, remove, mkdirp } from "fs-extra";
 import { default as FileWriter } from "./lib/file";
-import { Platforms, Paths  } from "./lib/types";
+import { Platforms, Paths } from "./lib/types";
 
 /**
  * Removes and then creates the directories that hold generated files
@@ -18,7 +18,6 @@ async function recreateOutputDirectories(paths: Paths): Promise<void> {
 
 /**
  * Calls all fetch methods and calls all write methods
- * @remark entry point to the script
  */
 async function main(argV: string[]): Promise<void> {
   const DEFAULT_OUTPUT = "output";
@@ -61,8 +60,8 @@ async function main(argV: string[]): Promise<void> {
   log("done");
 }
 
-process.on("unhandledRejection", () => {});
-process.on("uncaughtException", () => {});
+process.on("unhandledRejection", () => { });
+process.on("uncaughtException", () => { });
 
 main(process.argv).catch(async (err: Error) => {
   log(err.stack as string, { isError: true });
