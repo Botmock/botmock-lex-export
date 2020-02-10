@@ -1,6 +1,6 @@
 # Botmock Lex Export
 
-[![Build Status](https://dev.azure.com/botmock/botmock-lex-exporter/_apis/build/status/Botmock.botmock-lex-export?branchName=master)](https://dev.azure.com/botmock/botmock-lex-exporter/_build/latest?definitionId=7&branchName=master)
+<!-- [![Build Status](https://dev.azure.com/botmock/botmock-lex-exporter/_apis/build/status/Botmock.botmock-lex-export?branchName=master)](https://dev.azure.com/botmock/botmock-lex-exporter/_build/latest?definitionId=7&branchName=master) -->
 
 > create amazon lex [resources](https://docs.aws.amazon.com/IAM/latest/UserGuide/list_amazonlex.html#amazonlex-resources-for-iam-policies) from botmock projects
 
