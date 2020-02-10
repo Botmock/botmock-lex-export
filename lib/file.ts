@@ -4,6 +4,7 @@ import * as flow from "@botmock-api/flow";
 import { writeJson } from "fs-extra";
 import { join } from "path";
 import { EOL } from "os";
+import { notDeepStrictEqual } from "assert";
 import { ProjectData, Lex } from "./types";
 
 interface IConfig {
@@ -13,7 +14,7 @@ interface IConfig {
 
 export default class FileWriter<S extends object> extends flow.AbstractProject {
   static botmockCardType = "generic";
-  static clarificationPrompt = "I didn't understand you, what would you like me to do?";
+  static clarificationPrompt = "I didn't understand you, what would you like me to do";
   static abortStatement = "Sorry, I am not able to assist at this time";
   static responseCardContentType = "application/vnd.amazonaws.card.generic";
   static voiceId = "Joanna";
@@ -59,7 +60,7 @@ export default class FileWriter<S extends object> extends flow.AbstractProject {
   private generateSlotTypesForProject(): Lex.Slots {
     return this.projectData.entities.map(entity => ({
       description: entity.id,
-      name: entity.name,
+      name: this.sanitizeText(entity.name),
       version: FileWriter.version,
       enumerationValues: entity.data.map((datapoint: any) => ({ value: datapoint.value })),
       valueSelectionStrategy: Lex.ValueSelectionStrategies.original,
@@ -76,16 +77,23 @@ export default class FileWriter<S extends object> extends flow.AbstractProject {
         const [idOfMessage, idsOfIntents] = pair;
         return [
           ...acc,
-          ...idsOfIntents.map(intentId => ({
-            intent: this.getIntent(intentId),
-            messageId: idOfMessage,
-          }))
+          ...idsOfIntents
+            .map(intentId => ({
+              intent: this.getIntent(intentId),
+              messageId: idOfMessage,
+            }))
+            .filter(intent => !!intent.intent)
         ];
       }, []);
     return intentsInFlow.map(({ intent = {}, messageId }: { [key: string]: any; }) => {
-      const description = new Date().toLocaleString();
       const { name: intentName, slots = [], utterances = [] } = intent ?? {};
       const name = this.sanitizeText(intentName ?? "");
+      try {
+        notDeepStrictEqual(name, "");
+      } catch (err) {
+        console.log(`missing name for intent: ${intent.id}`);
+        process.exit(1);
+      }
       const connectedMessage = this.getMessage(messageId) as flow.Message;
       const messagesInSegment = this.gatherMessagesUpToNextIntent(connectedMessage);
       const attachments = [
@@ -122,10 +130,10 @@ export default class FileWriter<S extends object> extends flow.AbstractProject {
       const messages = [connectedMessage, ...messagesInSegment].map((message, index) => ({
         groupNumber: index + 1,
         contentType: Lex.ContentTypes.text,
-        content: wrapEntitiesWithChar((message.payload as any).text || FileWriter.botmockCardType, "{"),
+        content: wrapEntitiesWithChar((message.payload as any).text || FileWriter.botmockCardType, "{").replace(/\?|!/g, ""),
       }));
       return {
-        description,
+        description: "",
         name,
         version: FileWriter.intentVersion,
         fulfillmentActivity: {
@@ -162,7 +170,7 @@ export default class FileWriter<S extends object> extends flow.AbstractProject {
                   messages: [
                     {
                       contentType: Lex.ContentTypes.text,
-                      content: wrapEntitiesWithChar(slot.prompt, "{"),
+                      content: wrapEntitiesWithChar(slot.prompt, "{").replace(/\?|!/g, ""),
                     },
                   ],
                   maxAttempts: FileWriter.maxValueElicitationAttempts,
