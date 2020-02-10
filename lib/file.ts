@@ -122,8 +122,7 @@ export default class FileWriter<S extends object> extends flow.AbstractProject {
       const messages = [connectedMessage, ...messagesInSegment].map((message, index) => ({
         groupNumber: index + 1,
         contentType: Lex.ContentTypes.text,
-        // @ts-ignore
-        content: wrapEntitiesWithChar(message.payload.text || FileWriter.botmockCardType, "{"),
+        content: wrapEntitiesWithChar((message.payload as any).text || FileWriter.botmockCardType, "{"),
       }));
       return {
         description,
