@@ -5,20 +5,7 @@ import { Batcher } from "@botmock-api/client";
 import { default as log } from "@botmock-api/log";
 import { writeJson, remove, mkdirp } from "fs-extra";
 import { default as FileWriter } from "./lib/file";
-
-enum Platforms {
-  AIX = "aix",
-  DARWIN = "darwin",
-  BSD = "freebsd",
-  LINUX = "linux",
-  OPEN_BSD = "openbsd",
-  SUN_OS = "sunos",
-  WIN = "win32",
-}
-
-interface Paths {
-  readonly outputPath: string;
-}
+import { Platforms, Paths  } from "./lib/types";
 
 /**
  * Removes and then creates the directories that hold generated files

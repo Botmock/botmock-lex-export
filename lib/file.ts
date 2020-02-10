@@ -4,29 +4,7 @@ import * as flow from "@botmock-api/flow";
 import { writeJson } from "fs-extra";
 import { join } from "path";
 import { EOL } from "os";
-
-namespace Lex {
-  export interface Resource { };
-  export type Intents = unknown[];
-  export type Slots = unknown[];
-  export enum ContentTypes {
-    text = "PlainText",
-  }
-  export enum ObfuscationSettings {
-    none = "NONE",
-  }
-  export enum SlotConstraints {
-    required = "Required",
-  }
-  export enum ValueSelectionStrategies {
-    original = "ORIGINAL_VALUE",
-  }
-  export enum FulfillmentActivityTypes {
-    return = "ReturnIntent",
-  }
-}
-
-export type ProjectData<T> = T extends Promise<infer K> ? K : any;
+import { ProjectData, Lex } from "./types";
 
 interface IConfig {
   readonly outputDirectory: string;
