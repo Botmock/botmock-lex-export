@@ -33,7 +33,7 @@ interface IConfig {
   readonly projectData: ProjectData<unknown>;
 }
 
-export default class FileWriter extends flow.AbstractProject {
+export default class FileWriter<S extends object> extends flow.AbstractProject {
   static botmockCardType = "generic";
   static clarificationPrompt = "I didn't understand you, what would you like me to do?";
   static abortStatement = "Sorry, I am not able to assist at this time";
@@ -49,8 +49,6 @@ export default class FileWriter extends flow.AbstractProject {
   private outputDirectory: string;
   /**
    * Creates new instance of FileWriter class
-   *
-   * @param config object containing project data and path to output directory
    */
   constructor(config: IConfig) {
     super({ projectData: config.projectData as ProjectData<typeof config.projectData> });
@@ -58,7 +56,6 @@ export default class FileWriter extends flow.AbstractProject {
   }
   /**
    * Removes disallowed characters from text
-   * @param text the text to transform
    */
   private sanitizeText(text: string): string {
     const disallowedCharactersRegex = new RegExp(/\s|-|_|\./g);
@@ -97,7 +94,7 @@ export default class FileWriter extends flow.AbstractProject {
    */
   private generateIntentsForProject(): Lex.Intents {
     const intentsInFlow = Array.from(this.segmentizeBoardFromMessages())
-      .reduce((acc, pair: [string, string[]]) => {
+      .reduce((acc, pair: [string, string[]]): any => {
         const [idOfMessage, idsOfIntents] = pair;
         return [
           ...acc,
@@ -123,11 +120,11 @@ export default class FileWriter extends flow.AbstractProject {
           version: FileWriter.version,
           contentType: FileWriter.responseCardContentType,
           genericAttachments: attachments
-            .reduce((acc, message) => {
-              const { elements } = message.payload;
+            .reduce((acc, message): any => {
+              const { elements } = message.payload as any;
               return [
                 ...acc,
-                ...elements.reduce((acc, element: any) => {
+                ...elements.reduce((acc: any, element: any) => {
                   return [
                     ...acc,
                     {
@@ -147,6 +144,7 @@ export default class FileWriter extends flow.AbstractProject {
       const messages = [connectedMessage, ...messagesInSegment].map((message, index) => ({
         groupNumber: index + 1,
         contentType: Lex.ContentTypes.text,
+        // @ts-ignore
         content: wrapEntitiesWithChar(message.payload.text || FileWriter.botmockCardType, "{"),
       }));
       return {
