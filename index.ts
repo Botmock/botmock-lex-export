@@ -29,10 +29,16 @@ async function main(argV: string[]): Promise<void> {
   await recreateOutputDirectories({ outputPath: outputDirectory, });
   log("fetching project data");
   const { data: projectData } = await new Batcher({
-    token: process.env.BOTMOCK_TOKEN as string,
-    teamId: process.env.BOTMOCK_TEAM_ID as string,
-    projectId: process.env.BOTMOCK_PROJECT_ID as string,
-    boardId: process.env.BOTMOCK_BOARD_ID as string,
+    clientConfig: {
+      token: process.env.BOTMOCK_TOKEN as string,
+      subdomain: process.env.SUBDOMAIN as any,
+      shouldRejectUnauthorized: process.env.SHOULD_REJECT_UNAUTHORIZED as any,
+    },
+    projectConfig: {
+      teamId: process.env.BOTMOCK_TEAM_ID as string,
+      projectId: process.env.BOTMOCK_PROJECT_ID as string,
+      boardId: process.env.BOTMOCK_BOARD_ID as string,
+    }
   }).batchRequest([
     "project",
     "board",
