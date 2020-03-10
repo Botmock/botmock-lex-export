@@ -69,6 +69,18 @@ BOTMOCK_PROJECT_ID=@botmock-project-id
 
 To get your Botmock API token, follow the [guide](http://help.botmock.com/en/articles/2334581-developer-api).
 
+Optionally, custom subdomain can be used by defining
+
+```shell
+SUBDOMAIN="ww2"
+```
+
+Also, configuring the client HTTP agent to reject unauthorized requests can be accomplished through
+
+```shell
+shouldRejectUnauthorized="false"
+```
+
 ### Commands
 
 #### `start`

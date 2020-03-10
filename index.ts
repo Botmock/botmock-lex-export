@@ -28,11 +28,17 @@ async function main(argV: string[]): Promise<void> {
   log("creating output directories");
   await recreateOutputDirectories({ outputPath: outputDirectory, });
   log("fetching project data");
+  const shouldRejectUnauthorized = typeof process.env.SHOULD_REJECT_UNAUTHORIZED !== "undefined"
+    ? JSON.parse(process.env.SHOULD_REJECT_UNAUTHORIZED.toLowerCase())
+    : undefined;
+  const subdomain = typeof process.env.SUBDOMAIN !== "undefined"
+    ? JSON.parse(process.env.SUBDOMAIN)
+    : undefined;
   const { data: projectData } = await new Batcher({
     clientConfig: {
       token: process.env.BOTMOCK_TOKEN as string,
-      subdomain: process.env.SUBDOMAIN as any,
-      shouldRejectUnauthorized: process.env.SHOULD_REJECT_UNAUTHORIZED as any,
+      subdomain,
+      shouldRejectUnauthorized,
     },
     projectConfig: {
       teamId: process.env.BOTMOCK_TEAM_ID as string,
