@@ -28,16 +28,19 @@ async function main(argV: string[]): Promise<void> {
   log("creating output directories");
   await recreateOutputDirectories({ outputPath: outputDirectory, });
   log("fetching project data");
-  const shouldRejectUnauthorized = typeof process.env.SHOULD_REJECT_UNAUTHORIZED !== "undefined"
-    ? JSON.parse(process.env.SHOULD_REJECT_UNAUTHORIZED.toLowerCase())
-    : undefined;
-  const subdomain = typeof process.env.SUBDOMAIN !== "undefined"
-    ? JSON.parse(process.env.SUBDOMAIN)
-    : undefined;
+  let shouldRejectUnauthorized: boolean | undefined;
+  switch (process.env.SHOULD_REJECT_UNAUTHORIZED) {
+    case "true":
+      shouldRejectUnauthorized = true;
+      break;
+    case "false":
+      shouldRejectUnauthorized = false;
+      break;
+  }
   const { data: projectData } = await new Batcher({
     clientConfig: {
       token: process.env.BOTMOCK_TOKEN as string,
-      subdomain,
+      subdomain: process.env.SUBDOMAIN,
       shouldRejectUnauthorized,
     },
     projectConfig: {
