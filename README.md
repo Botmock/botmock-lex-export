@@ -61,25 +61,13 @@ npm i
 Create `.env` in `/botmock-lex-export` and fill in values for the following:
 
 ```shell
-BOTMOCK_TOKEN=@botmock-token
-BOTMOCK_TEAM_ID=@botmock-team-id
-BOTMOCK_BOARD_ID=@botmock-board-id
-BOTMOCK_PROJECT_ID=@botmock-project-id
+BOTMOCK_TOKEN="token"
+BOTMOCK_TEAM_ID="team_id"
+BOTMOCK_BOARD_ID="board_id"
+BOTMOCK_PROJECT_ID="project_id"
 ```
 
 To get your Botmock API token, follow the [guide](http://help.botmock.com/en/articles/2334581-developer-api).
-
-Optionally, custom subdomain can be used by defining
-
-```shell
-SUBDOMAIN="ww2"
-```
-
-Also, configuring the client HTTP agent to reject unauthorized requests can be accomplished through
-
-```shell
-shouldRejectUnauthorized="false"
-```
 
 ### Commands
 
