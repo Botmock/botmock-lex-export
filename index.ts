@@ -1,7 +1,8 @@
 import "dotenv/config";
 import { join } from "path";
 import { zipSync } from "cross-zip";
-import { Batcher } from "@botmock-api/client";
+import { HttpsProxyAgent } from "https-proxy-agent";
+import { Batcher, ClientConfig } from "@botmock-api/client";
 import { default as log } from "@botmock-api/log";
 import { writeJson, remove, mkdirp } from "fs-extra";
 import { default as FileWriter } from "./lib/file";
@@ -28,21 +29,14 @@ async function main(argV: string[]): Promise<void> {
   log("creating output directories");
   await recreateOutputDirectories({ outputPath: outputDirectory, });
   log("fetching project data");
-  let shouldRejectUnauthorized: boolean | undefined;
-  switch (process.env.SHOULD_REJECT_UNAUTHORIZED) {
-    case "true":
-      shouldRejectUnauthorized = true;
-      break;
-    case "false":
-      shouldRejectUnauthorized = false;
-      break;
-  }
+  const clientConfig: ClientConfig = {
+    token: process.env.BOTMOCK_TOKEN as string,
+    agent: typeof process.env.HTTP_PROXY !== "undefined"
+      ? new HttpsProxyAgent(process.env.HTTP_PROXY) as any
+      : undefined
+  };
   const { data: projectData } = await new Batcher({
-    clientConfig: {
-      token: process.env.BOTMOCK_TOKEN as string,
-      subdomain: process.env.SUBDOMAIN,
-      shouldRejectUnauthorized,
-    },
+    clientConfig,
     projectConfig: {
       teamId: process.env.BOTMOCK_TEAM_ID as string,
       projectId: process.env.BOTMOCK_PROJECT_ID as string,
