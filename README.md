@@ -16,6 +16,7 @@ Node.js project for importing [Botmock](https://botmock.com) projects in [Lex](h
 
 > **Note**: prerequisites
 > - [Node.js LTS version](https://nodejs.org/en/)
+> - [AWS Account](https://console.aws.amazon.com/console/home)
 
 Running the following commands should allow you to generate restorable content from your Botmock project.
 
@@ -26,3 +27,14 @@ Running the following commands should allow you to generate restorable content f
 - `npm start`
 
 `./output` should be generated in your project root.
+
+### Importing
+
+### Importing
+
+- Compress the `.json` file generated in `./output`
+- Visit the Lex console [AWS console](https://console.aws.amazon.com/lex/)
+- Choose **Bots**
+- Choose **Actions**
+- Choose **Import**
+- Select the `.zip` file
