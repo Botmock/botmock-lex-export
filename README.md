@@ -1,90 +1,28 @@
 # Botmock Lex Export
 
-<!-- [![Build Status](https://dev.azure.com/botmock/botmock-lex-exporter/_apis/build/status/Botmock.botmock-lex-export?branchName=master)](https://dev.azure.com/botmock/botmock-lex-exporter/_build/latest?definitionId=7&branchName=master) -->
+Node.js project for importing [Botmock](https://botmock.com) projects in [Lex](https://aws.amazon.com/lex/)
 
-> create amazon lex [resources](https://docs.aws.amazon.com/IAM/latest/UserGuide/list_amazonlex.html#amazonlex-resources-for-iam-policies) from botmock projects
-
-This script produces a `.json` file able to be imported as a resource in the Amazon Lex dashboard.
+> **Note**: The deprecated version of this exporter can be found in the `legacy` branch.
 
 ## Table of Contents
 
 * [Overview](#overview)
-  * [Botmock project structure](#botmock-project-structure)
-  * [Approach to importing](#approach-to-importing)
-  * [Prerequisites](#prerequisites)
-    * [nodejs](#nodejs)
-    * [aws](#aws)
-  * [Installation](#installation)
-    * [clone](#clone)
-    * [env](#env)
-  * [Commands](#commands)
-    * [start](#start)
+  * [Usage](#usage)
   * [Importing](#importing)
 
 ## Overview
 
-### Botmock project structure
+### Usage
 
-When designing a project, the main thing to keep in mind is that intents on connectors are responsible for breaking up the flow into the different intents recognized by Lex. Messages between connectors that have intents are treated as messages or response cards within the same Lex intent.
+> **Note**: prerequisites
+> - [Node.js LTS version](https://nodejs.org/en/)
 
-### Prerequisites
+Running the following commands should allow you to generate restorable content from your Botmock project.
 
-#### Node
+- `git clone git@github.com:Botmock/botmock-lex-export.git`
+- `cd botmock-lex-export`
+- `npm install`
+- `mv ./sample.env ./env` and edit `.env` to contain your token and project ids
+- `npm start`
 
-- [Node.js](https://nodejs.org/en/) >= 12.x
-
-```shell
-# check nodejs version
-node --version
-```
-
-#### AWS
-
-- [AWS Account](https://console.aws.amazon.com/console/home)
-
-### Installation
-
-#### Clone
-
-Clone this repository and install dependencies:
-
-```shell
-git clone git@github.com:Botmock/botmock-lex-export.git
-
-cd botmock-lex-export
-
-npm i
-```
-
-#### Env
-
-Create `.env` in `/botmock-lex-export` and fill in values for the following:
-
-```shell
-BOTMOCK_TOKEN=@botmock-token
-BOTMOCK_TEAM_ID=@botmock-team-id
-BOTMOCK_BOARD_ID=@botmock-board-id
-BOTMOCK_PROJECT_ID=@botmock-project-id
-```
-
-To get your Botmock API token, follow the [guide](http://help.botmock.com/en/articles/2334581-developer-api).
-
-### Commands
-
-#### `start`
-
-Populates `/output` with `.zip` file produced from your original project.
-
-```shell
-# start the exporter
-npm start
-```
-
-### Importing
-
-- Compress the generated `.json` file
-- Visit the Lex console [AWS console](https://console.aws.amazon.com/lex/)
-- Choose **Bots**
-- Choose **Actions**
-- Choose **Import**
-- Select the `.zip` file
+`./output` should be generated in your project root.
