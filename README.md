@@ -23,7 +23,7 @@ Running the following commands should allow you to generate restorable content f
 - `git clone git@github.com:Botmock/botmock-lex-export.git`
 - `cd botmock-lex-export`
 - `npm install`
-- `mv ./sample.env ./env` and edit `.env` to contain your [token and project ids](http://help.botmock.com/en/articles/2334581-developer-api)
+- `mv ./sample.env ./.env` and edit `.env` to contain your [token and project ids](http://help.botmock.com/en/articles/2334581-developer-api)
 - `npm start`
 
 `./output` should be generated in your project root.
