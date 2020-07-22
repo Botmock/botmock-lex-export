@@ -2,7 +2,7 @@ import "dotenv/config";
 import { LexExporter, FileWriter, Kind, ProjectReference } from "@botmock/export";
 
 /**
- * Generates `./domain.yml` and `./data` directory in `./output`.
+ * Generates `.json` in `./output`.
  *
  * @example
  * ```shell
